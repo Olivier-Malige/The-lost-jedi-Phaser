@@ -38,6 +38,7 @@ BasicGame.Game.prototype = {
         this.tie = this.add.sprite(512,380,'tie');
         this.tie.animations.add('idle',[0,1,2,3],10,true);
 
+
         //Scale sprites
         this.tie.scale.set(4);
         this.gLaser.scale.set(4);
@@ -48,14 +49,18 @@ BasicGame.Game.prototype = {
 
         //set sprites anchor
         this.tie.anchor.setTo(0.5,0.5);
-        this.glaser.anchor.setTo(0.5,0);
+        this.gLaser.anchor.setTo(0.5,0.5);
+
+        //sprites physics
+        this.physics.enable(this.gLaser,Phaser.Physics.ARCADE);
+        this.gLaser.body.velocity.y = 600;
 
         this.tie.play('idle');
     },
 
     update: function () {
         //  Honestly, just about anything could go here. It's YOUR game after all. Eat your heart out!
-        this.gLaser.y += 10;
+
 
     },
 
