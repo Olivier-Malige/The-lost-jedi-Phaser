@@ -1,21 +1,17 @@
 ﻿GAMEJAM  GAMEOFF
-NOVEMBRE
-Team :  faut trouver un nom
+NOVEMBRE 2017
+
+
 
 
 Thème : Throwback
-
-
 Techno: JS / Phaser
-
-
 Titre: The lost jedi
-
-
 Genre: Shoot’em up
-
-
 Synopsis: Un jedi solitaire qui doit améliorer son vaisseau pour rentrer chez lui
+Repository : https://github.com/Arknoid/The-lost-jedi
+Team :  faut trouver un nom!
+License : MIT
 
 
 Scrolling vertical et horizontal, top-down.
