@@ -26,16 +26,36 @@ BasicGame.Game = function (game) {
 };
 
 BasicGame.Game.prototype = {
+    preload : function (){
+      this.load.image('gLaser','Assets/gLaser.png');
+      this.load.spritesheet('tie','Assets/tie-Sheet.png',8,8);
+    },
 
     create: function () {
-
         //  Honestly, just about anything could go here. It's YOUR game after all. Eat your heart out!
+        this.gLaser = this.add.sprite(512, 400, 'gLaser');
 
+        this.tie = this.add.sprite(512,380,'tie');
+        this.tie.animations.add('idle',[0,1,2,3],10,true);
+
+        //Scale sprites
+        this.tie.scale.set(4);
+        this.gLaser.scale.set(4);
+
+        //No blur
+        this.tie.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
+        this.gLaser.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
+
+        //set sprites anchor
+        this.tie.anchor.setTo(0.5,0.5);
+        this.glaser.anchor.setTo(0.5,0);
+
+        this.tie.play('idle');
     },
 
     update: function () {
-
         //  Honestly, just about anything could go here. It's YOUR game after all. Eat your heart out!
+        this.gLaser.y += 10;
 
     },
 
