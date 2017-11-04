@@ -41,7 +41,7 @@ BasicGame.Game.prototype = {
         this.gLaser = this.add.sprite(512, 400, 'gLaser');
         this.rLaser = this.add.sprite(512,680, 'rLaser');
         this.xWing = this.add.sprite(512,700 , 'xWing');
-        this.explosion = this.add.sprite(100,100,'explosion')
+        this.explosion = this.add.sprite(100,100,'explosion');
         this.tie = this.add.sprite(512,380,'tie');
 
         //animates
