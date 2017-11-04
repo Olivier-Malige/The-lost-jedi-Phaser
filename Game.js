@@ -46,7 +46,7 @@ BasicGame.Game.prototype = {
 
         //animates
         this.tie.animations.add('idle',[0,1,2,3],10,true);
-        this.explosion.animations.add('start',[0,1,2,3,4,5,6,7,8,9],50,false);
+        this.explosion.animations.add('start',[0,1,2,3,4,5,6,7,8,9,10],50,false);
 
         //Scale sprites
         this.tie.scale.set(4);
@@ -77,6 +77,7 @@ BasicGame.Game.prototype = {
         this.gLaser.body.velocity.y = 600;
         this.rLaser.body.velocity.y = -600;
 
+        //Start animates
         this.tie.play('idle');
         this.explosion.play('start');
     },
