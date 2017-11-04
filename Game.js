@@ -1,5 +1,5 @@
 
-BasicGame.Game = function (game) {
+BasicGame.Game = function (game) { //test d'actualisation
 
     //  When a State is added to Phaser it automatically has the following properties set on it, even if they already exist:
 
