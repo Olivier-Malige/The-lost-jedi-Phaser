@@ -70,6 +70,16 @@ BasicGame.Game.prototype = {
       enemy.animations.add('idle', [0, 1, 2, 3], 20, true);
     });
 
+    //Group explosionPool
+    this.explosionPool = this.add.group();
+    this.explosionPool.enableBody = true;
+    this.explosionPool.physicsBodyType = Phaser.Physics.ARCADE;
+    this.explosionPool.createMultiple(100,'explosion');
+    this.explosionPool.setAll('anchor.x', 0.5);
+    this.explosionPool.setAll('anchor.y', 0.5);
+    this.explosionPool.forEach(function (explosion) {
+    explosion.animations.add('start');
+    });
 
     //Add Sprites
     this.player = this.add.sprite(512, 700, 'xWing');
@@ -93,6 +103,7 @@ BasicGame.Game.prototype = {
     this.player.speed = 400;
     this.player.body.collideWorldBounds = true;
     this.player.body.setSize(4,4,2,2); // reduction de la hitbox
+    this.player.scale.set(4);
 
 
     //Controle de base au clavier
@@ -116,7 +127,7 @@ BasicGame.Game.prototype = {
 
     //Gestions des collisions
     this.physics.arcade.overlap(
-      this.playerShotPool, this.enemyPool, this.shotHit, null, this
+      this.playerShotPool, this.enemyPool, this.enemyHit, null, this
     );
     this.physics.arcade.overlap(
       this.player, this.enemyPool, this.playerHit, null, this
@@ -181,36 +192,37 @@ BasicGame.Game.prototype = {
     laserPlayer.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
   },
   
+  enemyHit: function (shot, enemy) {
+    enemy.kill();
+    this.explode(enemy);
+    shot.kill();
+  },
+
   playerHit: function (player, enemy) {
     enemy.kill();
-    var explosion = this.add.sprite(player.x, player.y, 'explosion');
-    explosion.anchor.setTo(0.5, 0.5);
-    explosion.animations.add('start');
-    explosion.scale.set(4);
-    explosion.play('start', 15, false, true);
-    explosion.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
+    this.explode(player);
     player.kill();
   },
 
-  shotHit: function (laser, target) {
-    //Destroy sprites
-    laser.kill();
-    target.kill();
-    var explosion = this.add.sprite(target.x, target.y, 'explosion');
-
-    //play explosion
-    explosion.anchor.setTo(0.5, 0.5);
-    explosion.animations.add('start');
-    explosion.play('start', 15, false, true);
-    explosion.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
+  explode: function (sprite) {
+    if (this.explosionPool.countDead() === 0) {
+    return;
+    }
+    var explosion = this.explosionPool.getFirstExists(false);
+    explosion.reset(sprite.x, sprite.y);
+    explosion.play('start', 10, false, true);
+    // add the original sprite's velocity to the explosion
+    explosion.body.velocity.x = sprite.body.velocity.x;
+    explosion.body.velocity.y = sprite.body.velocity.y;
     explosion.scale.set(4);
+    explosion.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
+    },
 
-  },
   render: function () {
     //Debug Collision
     if (debugCol) {
-      this.game.debug.body(this.ennemyLaser);
-      this.game.debug.body(this.playerLaser);
+      //this.game.debug.body(this.ennemyLaser);
+      //this.game.debug.body(this.playerLaser);
       this.game.debug.body(this.player);
     }
   },
