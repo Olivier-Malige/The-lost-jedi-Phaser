@@ -1,4 +1,3 @@
-
 // Variable pour afficher les HitsBox
 var debugCol = false;
 
@@ -44,12 +43,15 @@ BasicGame.Game.prototype = {
     this.ennemyLaser = this.add.sprite(512, 400, 'gLaser');
     this.player = this.add.sprite(512, 700, 'xWing');
     this.tie = this.add.sprite(512, 380, 'tie');
-    
+
     //Shot variables
     this.playerShots = [];
     this.nextShotAt = 0;
     this.shotDelay = 100;
     this.shotSpeed = 800;
+
+    //Duré affichae des instructions
+    this.instructionsDelay = 4; //Secondes
 
     //animates
     this.tie.animations.add('idle', [0, 1, 2, 3], 10, true);
@@ -79,60 +81,76 @@ BasicGame.Game.prototype = {
     this.ennemyLaser.body.velocity.y = 600;
 
 
-    //Controle de base au clavier 
+    //Controle de base au clavier
     this.cursors = this.input.keyboard.createCursorKeys();
 
     //Player variables
     this.player.speed = 400;
     this.player.body.collideWorldBounds = true;
-    
+
     //Start animates
     this.tie.play('idle');
+
+    //Affichage des commandes
+    this.instructions = this.add.text(510, 600,
+      'Use Arrow Keys to Move, Press SPACE to Fire', {
+        font: '20px monospace',
+        fill: '#fff',
+        align: 'center'
+      }
+    );
+    this.instructions.anchor.setTo(0.5, 0.5);
+    this.instExpire = this.time.now + this.instructionsDelay*600;
   },
 
   update: function() {
     //Honestly, just about anything could go here. It's YOUR game after all. Eat your heart out!
 
     //Gestions des collisions
-    this.physics.arcade.overlap(this.ennemyLaser,this.player,this.shotHit,null,this);
-    
-    //Controle du joueur 
+    this.physics.arcade.overlap(this.ennemyLaser, this.player, this.shotHit, null, this);
+
+    //Controle du joueur
     this.player.body.velocity.x = 0;
     this.player.body.velocity.y = 0;
 
     //Parcours du tableau playerShots pour gerer les collisions avec l'ennemy
     for (var i = 0; i < this.playerShots.length; i++) {
       this.physics.arcade.overlap(
-      this.playerShots[i], this.tie, this.shotHit, null, this);
+        this.playerShots[i], this.tie, this.shotHit, null, this);
     }
 
     //Gestion du controle player
-    if (this.cursors.left.isDown){
-        this.player.body.velocity.x = -this.player.speed;  
-    } else if (this.cursors.right.isDown){
-        this.player.body.velocity.x = this.player.speed;
+    if (this.cursors.left.isDown) {
+      this.player.body.velocity.x = -this.player.speed;
+    } else if (this.cursors.right.isDown) {
+      this.player.body.velocity.x = this.player.speed;
     }
 
-    if (this.cursors.up.isDown){
-        this.player.body.velocity.y = -this.player.speed;
-      }else if (this.cursors.down.isDown){
-        this.player.body.velocity.y = this.player.speed;
-      }
-    
-    //appel de la fonction fire 
-    if (this.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)){
+    if (this.cursors.up.isDown) {
+      this.player.body.velocity.y = -this.player.speed;
+    } else if (this.cursors.down.isDown) {
+      this.player.body.velocity.y = this.player.speed;
+    }
+
+    //appel de la fonction fire
+    if (this.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
       this.fire();
+    }
+
+    //apres un certain temps efface les instructions
+    if (this.instructions.exists && this.time.now > this.instExpire) {
+      this.instructions.destroy();
     }
 
   },
 
   fire: function() {
-    //Gestion du delay 
-    if (this.nextShotAt > this.time.now){
+    //Gestion du delay
+    if (this.nextShotAt > this.time.now) {
       return
     }
-    this.nextShotAt= this.time.now + this.shotDelay;
-    
+    this.nextShotAt = this.time.now + this.shotDelay;
+
     //Laser spawn
     var playerLaser = this.add.sprite(this.player.x, this.player.y - 20, 'rLaser');
     playerLaser.anchor.setTo(0.5, 0.5);
@@ -143,18 +161,18 @@ BasicGame.Game.prototype = {
     playerLaser.scale.set(4);
   },
 
-  shotHit:function(laser,target){
+  shotHit: function(laser, target) {
     //Destroy sprites
     laser.kill();
     target.kill();
-    var explosion = this.add.sprite(target.x,target.y,'explosion');
-    
+    var explosion = this.add.sprite(target.x, target.y, 'explosion');
+
     //play explosion
-    explosion.anchor.setTo(0.5,0.5);
+    explosion.anchor.setTo(0.5, 0.5);
     explosion.animations.add('start');
-    explosion.play('start',15,false,true);
+    explosion.play('start', 15, false, true);
     explosion.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
-    explosion.scale.set(4);    
+    explosion.scale.set(4);
   },
   render: function() {
     //Debug Collision
@@ -162,7 +180,7 @@ BasicGame.Game.prototype = {
       this.game.debug.body(this.ennemyLaser);
       this.game.debug.body(this.playerLaser);
       this.game.debug.body(this.tie);
-     // this.game.debug.body(this.player);
+      // this.game.debug.body(this.player);
     }
   },
 
