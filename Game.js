@@ -42,9 +42,10 @@ BasicGame.Game.prototype = {
 
     //Add Sprites
     this.ennemyLaser = this.add.sprite(512, 400, 'gLaser');
-    this.playerLaser = this.add.sprite(512, 680, 'rLaser');
     this.player = this.add.sprite(512, 700, 'xWing');
     this.tie = this.add.sprite(512, 380, 'tie');
+
+    this.playerLasersArr = [];
 
     //animates
     this.tie.animations.add('idle', [0, 1, 2, 3], 10, true);
@@ -54,27 +55,26 @@ BasicGame.Game.prototype = {
     this.tie.scale.set(4);
     this.ennemyLaser.scale.set(4);
     this.player.scale.set(4);
-    this.playerLaser.scale.set(4);
+
 
     //No blur
     this.tie.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
     this.ennemyLaser.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
-    this.playerLaser.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
+
     this.player.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
 
     //set sprites anchor
     this.tie.anchor.setTo(0.5, 0.5);
     this.ennemyLaser.anchor.setTo(0.5, 0.5);
-    this.playerLaser.anchor.setTo(0.5, 0.5);
+
     this.player.anchor.setTo(0.5, 0.5);
 
     //sprites physics
     this.physics.enable(this.ennemyLaser, Phaser.Physics.ARCADE);
-    this.physics.enable(this.playerLaser, Phaser.Physics.ARCADE);
     this.physics.enable(this.tie, Phaser.Physics.ARCADE);
     this.physics.enable(this.player, Phaser.Physics.ARCADE);
     this.ennemyLaser.body.velocity.y = 600;
-    this.playerLaser.body.velocity.y = -600;
+
 
     //Controle de base au clavier 
     this.cursors = this.input.keyboard.createCursorKeys();
@@ -85,7 +85,6 @@ BasicGame.Game.prototype = {
     
     //Start animates
     this.tie.play('idle');
-    this.explosion.play('start');
   },
 
   update: function() {
@@ -93,12 +92,16 @@ BasicGame.Game.prototype = {
 
     //Gestions des collions
     this.physics.arcade.overlap(this.ennemyLaser,this.player,this.laserHit,null,this);
-    this.physics.arcade.overlap(this.playerLaser,this.tie,this.laserHit,null,this);
+    //this.physics.arcade.overlap(this.playerLaser,this.tie,this.laserHit,null,this);
     
     //Controle du joueur 
     this.player.body.velocity.x = 0;
     this.player.body.velocity.y = 0;
    
+    for (var i = 0; i < this.playerLasersArr.length; i++) {
+      this.physics.arcade.overlap(
+      this.playerLasersArr[i], this.tie, this.laserHit, null, this);
+    }
     if (this.cursors.left.isDown){
         this.player.body.velocity.x = -this.player.speed;  
     } else if (this.cursors.right.isDown){
@@ -109,13 +112,29 @@ BasicGame.Game.prototype = {
         this.player.body.velocity.y = -this.player.speed;
       }else if (this.cursors.down.isDown){
         this.player.body.velocity.y = this.player.speed;
-      } 
+      }
+
+    if (this.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)){
+      this.fire();
+    }
+
+  },
+
+  fire: function() {
+    var playerLaser = this.add.sprite(this.player.x, this.player.y - 20, 'rLaser');
+    playerLaser.anchor.setTo(0.5, 0.5);
+    this.physics.enable(playerLaser, Phaser.Physics.ARCADE);
+    playerLaser.body.velocity.y = -500;
+    this.playerLasersArr.push(playerLaser);
+    playerLaser.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
+    playerLaser.scale.set(4);
   },
 
   laserHit:function(laser,target){
     laser.kill();
     target.kill();
     var explosion = this.add.sprite(target.x,target.y,'explosion');
+    
     explosion.anchor.setTo(0.5,0.5);
     explosion.animations.add('start');
     explosion.play('start',15,false,true);
@@ -128,7 +147,7 @@ BasicGame.Game.prototype = {
       this.game.debug.body(this.ennemyLaser);
       this.game.debug.body(this.playerLaser);
       this.game.debug.body(this.tie);
-      this.game.debug.body(this.player);
+     // this.game.debug.body(this.player);
     }
   },
 
