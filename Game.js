@@ -1,3 +1,5 @@
+
+// Variable pour afficher les HitsBox
 var debugCol = false;
 
 BasicGame.Game = function(game) {
@@ -77,19 +79,32 @@ BasicGame.Game.prototype = {
     this.physics.enable(this.xWing, Phaser.Physics.ARCADE);
     this.gLaser.body.velocity.y = 600;
     this.rLaser.body.velocity.y = -600;
-
+    
     //Start animates
     this.tie.play('idle');
     this.explosion.play('start');
   },
 
   update: function() {
-    //  Honestly, just about anything could go here. It's YOUR game after all. Eat your heart out!
+    //Honestly, just about anything could go here. It's YOUR game after all. Eat your heart out!
 
+    //Gestions des collions
+    this.physics.arcade.overlap(this.gLaser,this.xWing,this.laserHit,null,this);
+    this.physics.arcade.overlap(this.rLaser,this.tie,this.laserHit,null,this);
+  },
 
+  laserHit:function(laser,target){
+    laser.kill();
+    target.kill();
+    var explosion = this.add.sprite(target.x,target.y,'explosion');
+    explosion.anchor.setTo(0.5,0.5);
+    explosion.animations.add('start');
+    explosion.play('start',15,false,true);
+    explosion.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
+    explosion.scale.set(4);    
   },
   render: function() {
-    //DebugCollision
+    //Debug Collision
     if (debugCol) {
       this.game.debug.body(this.gLaser);
       this.game.debug.body(this.rLaser);
