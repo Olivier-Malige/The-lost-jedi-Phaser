@@ -41,44 +41,40 @@ BasicGame.Game.prototype = {
     //Honestly, just about anything could go here. It's YOUR game after all. Eat your heart out!
 
     //Add Sprites
-    this.gLaser = this.add.sprite(512, 400, 'gLaser');
-    this.rLaser = this.add.sprite(512, 680, 'rLaser');
+    this.ennemyLaser = this.add.sprite(512, 400, 'gLaser');
+    this.playerLaser = this.add.sprite(512, 680, 'rLaser');
     this.player = this.add.sprite(512, 700, 'xWing');
-    this.explosion = this.add.sprite(100, 100, 'explosion');
     this.tie = this.add.sprite(512, 380, 'tie');
 
     //animates
     this.tie.animations.add('idle', [0, 1, 2, 3], 10, true);
-    this.explosion.animations.add('start', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 50, false);
+
 
     //Scale sprites
     this.tie.scale.set(4);
-    this.gLaser.scale.set(4);
+    this.ennemyLaser.scale.set(4);
     this.player.scale.set(4);
-    this.explosion.scale.set(4);
-    this.rLaser.scale.set(4);
+    this.playerLaser.scale.set(4);
 
     //No blur
     this.tie.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
-    this.gLaser.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
-    this.rLaser.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
+    this.ennemyLaser.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
+    this.playerLaser.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
     this.player.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
-    this.explosion.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
 
     //set sprites anchor
     this.tie.anchor.setTo(0.5, 0.5);
-    this.gLaser.anchor.setTo(0.5, 0.5);
-    this.rLaser.anchor.setTo(0.5, 0.5);
-    this.explosion.anchor.setTo(0.5, 0.5);
+    this.ennemyLaser.anchor.setTo(0.5, 0.5);
+    this.playerLaser.anchor.setTo(0.5, 0.5);
     this.player.anchor.setTo(0.5, 0.5);
 
     //sprites physics
-    this.physics.enable(this.gLaser, Phaser.Physics.ARCADE);
-    this.physics.enable(this.rLaser, Phaser.Physics.ARCADE);
+    this.physics.enable(this.ennemyLaser, Phaser.Physics.ARCADE);
+    this.physics.enable(this.playerLaser, Phaser.Physics.ARCADE);
     this.physics.enable(this.tie, Phaser.Physics.ARCADE);
     this.physics.enable(this.player, Phaser.Physics.ARCADE);
-    this.gLaser.body.velocity.y = 600;
-    this.rLaser.body.velocity.y = -600;
+    this.ennemyLaser.body.velocity.y = 600;
+    this.playerLaser.body.velocity.y = -600;
 
     //Controle de base au clavier 
     this.cursors = this.input.keyboard.createCursorKeys();
@@ -96,8 +92,8 @@ BasicGame.Game.prototype = {
     //Honestly, just about anything could go here. It's YOUR game after all. Eat your heart out!
 
     //Gestions des collions
-    this.physics.arcade.overlap(this.gLaser,this.player,this.laserHit,null,this);
-    this.physics.arcade.overlap(this.rLaser,this.tie,this.laserHit,null,this);
+    this.physics.arcade.overlap(this.ennemyLaser,this.player,this.laserHit,null,this);
+    this.physics.arcade.overlap(this.playerLaser,this.tie,this.laserHit,null,this);
     
     //Controle du joueur 
     this.player.body.velocity.x = 0;
@@ -129,8 +125,8 @@ BasicGame.Game.prototype = {
   render: function() {
     //Debug Collision
     if (debugCol) {
-      this.game.debug.body(this.gLaser);
-      this.game.debug.body(this.rLaser);
+      this.game.debug.body(this.ennemyLaser);
+      this.game.debug.body(this.playerLaser);
       this.game.debug.body(this.tie);
       this.game.debug.body(this.player);
     }
