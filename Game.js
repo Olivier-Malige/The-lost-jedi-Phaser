@@ -1,7 +1,7 @@
 // Variable pour afficher les HitsBox
 var debugCol = false;
 
-BasicGame.Game = function(game) {
+BasicGame.Game = function (game) {
 
 
   //  When a State is added to Phaser it automatically has the following properties set on it, even if they already exist:
@@ -28,7 +28,7 @@ BasicGame.Game = function(game) {
 };
 
 BasicGame.Game.prototype = {
-  preload: function() {
+  preload: function () {
     this.load.image('gLaser', 'Assets/gLaser.png');
     this.load.image('xWing', 'Assets/xWing.png');
     this.load.image('rLaser', 'Assets/rLaser.png');
@@ -36,16 +36,35 @@ BasicGame.Game.prototype = {
     this.load.spritesheet('explosion', 'Assets/explosion-Sheet.png', 8, 8);
   },
 
-  create: function() {
+  create: function () {
     //Honestly, just about anything could go here. It's YOUR game after all. Eat your heart out!
+    
+    // Add an empty sprite group into our game
+    this.playerShotPool = this.add.group();
+    // Enable physics to the whole sprite group
+    this.playerShotPool.enableBody = true;
+    this.playerShotPool.physicsBodyType = Phaser.Physics.ARCADE;
+    // Add 100 'bullet' sprites in the group.
+    // By default this uses the first frame of the sprite sheet and
+    //sets the initial state as non - existing(i.e.killed / dead)
+    this.playerShotPool.createMultiple(100, 'gLaser');
+    // Sets anchors of all sprites
+    this.playerShotPool.setAll('anchor.x', 0.5);
+    this.playerShotPool.setAll('anchor.y', 0.5);
+    // Automatically kill the bullet sprites when they go out of b
+    this.playerShotPool.setAll('outOfBoundsKill', true);
+    this.playerShotPool.setAll('checkWorldBounds', true);
+    // sets scales
+    // sets no blur
+    //this.playerShotPool.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
 
     //Add Sprites
-    this.ennemyLaser = this.add.sprite(512, 400, 'gLaser');
+    //this.ennemyLaser = this.add.sprite(512, 400, 'gLaser');
     this.player = this.add.sprite(512, 700, 'xWing');
     this.tie = this.add.sprite(512, 380, 'tie');
 
     //Shot variables
-    this.playerShots = [];
+    //this.playerShots = [];
     this.nextShotAt = 0;
     this.shotDelay = 100;
     this.shotSpeed = 800;
@@ -59,26 +78,26 @@ BasicGame.Game.prototype = {
 
     //Scale sprites
     this.tie.scale.set(4);
-    this.ennemyLaser.scale.set(4);
+    //this.ennemyLaser.scale.set(4);
     this.player.scale.set(4);
 
 
     //No blur
     this.tie.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
-    this.ennemyLaser.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
+    //this.ennemyLaser.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
     this.player.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
 
     //set sprites anchor
     this.tie.anchor.setTo(0.5, 0.5);
-    this.ennemyLaser.anchor.setTo(0.5, 0.5);
+    //this.ennemyLaser.anchor.setTo(0.5, 0.5);
 
     this.player.anchor.setTo(0.5, 0.5);
 
     //sprites physics
-    this.physics.enable(this.ennemyLaser, Phaser.Physics.ARCADE);
+    //this.physics.enable(this.ennemyLaser, Phaser.Physics.ARCADE);
     this.physics.enable(this.tie, Phaser.Physics.ARCADE);
     this.physics.enable(this.player, Phaser.Physics.ARCADE);
-    this.ennemyLaser.body.velocity.y = 600;
+    //this.ennemyLaser.body.velocity.y = 600;
 
 
     //Controle de base au clavier
@@ -100,24 +119,21 @@ BasicGame.Game.prototype = {
       }
     );
     this.instructions.anchor.setTo(0.5, 0.5);
-    this.instExpire = this.time.now + this.instructionsDelay*600;
+    this.instExpire = this.time.now + this.instructionsDelay * 600;
   },
 
-  update: function() {
+  update: function () {
     //Honestly, just about anything could go here. It's YOUR game after all. Eat your heart out!
 
     //Gestions des collisions
-    this.physics.arcade.overlap(this.ennemyLaser, this.player, this.shotHit, null, this);
-
+    //this.physics.arcade.overlap(this.ennemyLaser, this.player, this.shotHit, null, this);
+    this.physics.arcade.overlap(
+    this.playerShotPool, this.tie, this.shotHit, null, this
+    );
     //Controle du joueur
     this.player.body.velocity.x = 0;
     this.player.body.velocity.y = 0;
 
-    //Parcours du tableau playerShots pour gerer les collisions avec l'ennemy
-    for (var i = 0; i < this.playerShots.length; i++) {
-      this.physics.arcade.overlap(
-        this.playerShots[i], this.tie, this.shotHit, null, this);
-    }
 
     //Gestion du controle player
     if (this.cursors.left.isDown) {
@@ -136,7 +152,7 @@ BasicGame.Game.prototype = {
     if (this.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
       this.fire();
     }
-
+    
     //apres un certain temps efface les instructions
     if (this.instructions.exists && this.time.now > this.instExpire) {
       this.instructions.destroy();
@@ -144,24 +160,30 @@ BasicGame.Game.prototype = {
 
   },
 
-  fire: function() {
+  fire: function () {
     //Gestion du delay
     if (this.nextShotAt > this.time.now) {
       return
     }
+  
+    if (this.playerShotPool.countDead() === 0) {
+      return;
+    }
+
     this.nextShotAt = this.time.now + this.shotDelay;
 
-    //Laser spawn
-    var playerLaser = this.add.sprite(this.player.x, this.player.y - 20, 'rLaser');
-    playerLaser.anchor.setTo(0.5, 0.5);
-    this.physics.enable(playerLaser, Phaser.Physics.ARCADE);
-    playerLaser.body.velocity.y = -this.shotSpeed;
-    this.playerShots.push(playerLaser);
-    playerLaser.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
-    playerLaser.scale.set(4);
+
+    // Find the first dead laser in the pool
+    var laserPlayer = this.playerShotPool.getFirstExists(false);
+    // Reset (revive) the sprite and place it in a new location
+    laserPlayer.reset(this.player.x, this.player.y - 20);
+    laserPlayer.body.velocity.y = -this.shotSpeed;
+    laserPlayer.scale.set(4);
+    laserPlayer.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
+
   },
 
-  shotHit: function(laser, target) {
+  shotHit: function (laser, target) {
     //Destroy sprites
     laser.kill();
     target.kill();
@@ -173,8 +195,9 @@ BasicGame.Game.prototype = {
     explosion.play('start', 15, false, true);
     explosion.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
     explosion.scale.set(4);
+    
   },
-  render: function() {
+  render: function () {
     //Debug Collision
     if (debugCol) {
       this.game.debug.body(this.ennemyLaser);
@@ -184,7 +207,7 @@ BasicGame.Game.prototype = {
     }
   },
 
-  quitGame: function(pointer) {
+  quitGame: function (pointer) {
 
     //  Here you should destroy anything you no longer need.
     //  Stop music, delete sprites, purge caches, free resources, all that good stuff.
