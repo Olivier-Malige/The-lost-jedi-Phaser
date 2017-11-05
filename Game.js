@@ -44,8 +44,12 @@ BasicGame.Game.prototype = {
     this.ennemyLaser = this.add.sprite(512, 400, 'gLaser');
     this.player = this.add.sprite(512, 700, 'xWing');
     this.tie = this.add.sprite(512, 380, 'tie');
-
-    this.playerLasersArr = [];
+    
+    //Shot variables
+    this.playerShots = [];
+    this.nextShotAt = 0;
+    this.shotDelay = 100;
+    this.shotSpeed = 800;
 
     //animates
     this.tie.animations.add('idle', [0, 1, 2, 3], 10, true);
@@ -60,7 +64,6 @@ BasicGame.Game.prototype = {
     //No blur
     this.tie.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
     this.ennemyLaser.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
-
     this.player.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
 
     //set sprites anchor
@@ -90,30 +93,33 @@ BasicGame.Game.prototype = {
   update: function() {
     //Honestly, just about anything could go here. It's YOUR game after all. Eat your heart out!
 
-    //Gestions des collions
-    this.physics.arcade.overlap(this.ennemyLaser,this.player,this.laserHit,null,this);
-    //this.physics.arcade.overlap(this.playerLaser,this.tie,this.laserHit,null,this);
+    //Gestions des collisions
+    this.physics.arcade.overlap(this.ennemyLaser,this.player,this.shotHit,null,this);
     
     //Controle du joueur 
     this.player.body.velocity.x = 0;
     this.player.body.velocity.y = 0;
-   
-    for (var i = 0; i < this.playerLasersArr.length; i++) {
+
+    //Parcours du tableau playerShots pour gerer les collisions avec l'ennemy
+    for (var i = 0; i < this.playerShots.length; i++) {
       this.physics.arcade.overlap(
-      this.playerLasersArr[i], this.tie, this.laserHit, null, this);
+      this.playerShots[i], this.tie, this.shotHit, null, this);
     }
+
+    //Gestion du controle player
     if (this.cursors.left.isDown){
         this.player.body.velocity.x = -this.player.speed;  
     } else if (this.cursors.right.isDown){
         this.player.body.velocity.x = this.player.speed;
     }
 
-      if (this.cursors.up.isDown){
+    if (this.cursors.up.isDown){
         this.player.body.velocity.y = -this.player.speed;
       }else if (this.cursors.down.isDown){
         this.player.body.velocity.y = this.player.speed;
       }
-
+    
+    //appel de la fonction fire 
     if (this.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)){
       this.fire();
     }
@@ -121,20 +127,29 @@ BasicGame.Game.prototype = {
   },
 
   fire: function() {
+    //Gestion du delay 
+    if (this.nextShotAt > this.time.now){
+      return
+    }
+    this.nextShotAt= this.time.now + this.shotDelay;
+    
+    //Laser spawn
     var playerLaser = this.add.sprite(this.player.x, this.player.y - 20, 'rLaser');
     playerLaser.anchor.setTo(0.5, 0.5);
     this.physics.enable(playerLaser, Phaser.Physics.ARCADE);
-    playerLaser.body.velocity.y = -500;
-    this.playerLasersArr.push(playerLaser);
+    playerLaser.body.velocity.y = -this.shotSpeed;
+    this.playerShots.push(playerLaser);
     playerLaser.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
     playerLaser.scale.set(4);
   },
 
-  laserHit:function(laser,target){
+  shotHit:function(laser,target){
+    //Destroy sprites
     laser.kill();
     target.kill();
     var explosion = this.add.sprite(target.x,target.y,'explosion');
     
+    //play explosion
     explosion.anchor.setTo(0.5,0.5);
     explosion.animations.add('start');
     explosion.play('start',15,false,true);
