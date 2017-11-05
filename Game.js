@@ -38,64 +38,72 @@ BasicGame.Game.prototype = {
 
   create: function () {
     //Honestly, just about anything could go here. It's YOUR game after all. Eat your heart out!
-    
-    // Add an empty sprite group into our game
-    this.playerShotPool = this.add.group();
-    // Enable physics to the whole sprite group
-    this.playerShotPool.enableBody = true;
-    this.playerShotPool.physicsBodyType = Phaser.Physics.ARCADE;
-    // Add 100 'bullet' sprites in the group.
-    // By default this uses the first frame of the sprite sheet and
-    //sets the initial state as non - existing(i.e.killed / dead)
-    this.playerShotPool.createMultiple(100, 'gLaser');
-    // Sets anchors of all sprites
-    this.playerShotPool.setAll('anchor.x', 0.5);
-    this.playerShotPool.setAll('anchor.y', 0.5);
-    // Automatically kill the bullet sprites when they go out of b
-    this.playerShotPool.setAll('outOfBoundsKill', true);
-    this.playerShotPool.setAll('checkWorldBounds', true);
-    // sets scales
-    // sets no blur
-    //this.playerShotPool.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
 
+    //Group playerShotPool   
+      // Add an empty sprite group into our game
+      this.playerShotPool = this.add.group();
+      // Enable physics to the whole sprite group
+      this.playerShotPool.enableBody = true;
+      this.playerShotPool.physicsBodyType = Phaser.Physics.ARCADE;
+      // Add 100 'bullet' sprites in the group.
+      // By default this uses the first frame of the sprite sheet and
+      //sets the initial state as non - existing(i.e.killed / dead)
+      this.playerShotPool.createMultiple(100, 'gLaser');
+      // Sets anchors of all sprites
+      this.playerShotPool.setAll('anchor.x', 0.5);
+      this.playerShotPool.setAll('anchor.y', 0.5);
+      // Automatically kill the bullet sprites when they go out of b
+      this.playerShotPool.setAll('outOfBoundsKill', true);
+      this.playerShotPool.setAll('checkWorldBounds', true);
+    
+    //Group ennemyPool
+      this.enemyPool = this.add.group();
+      this.enemyPool.enableBody = true;
+      this.enemyPool.physicsBodyType = Phaser.Physics.ARCADE;
+      this.enemyPool.createMultiple(50, 'tie');
+      this.enemyPool.setAll('anchor.x', 0.5);
+      this.enemyPool.setAll('anchor.y', 0.5);
+      this.enemyPool.setAll('outOfBoundsKill', true);
+      this.enemyPool.setAll('checkWorldBounds', true);
+      // Set the animation for each sprite
+      this.enemyPool.forEach(function (enemy) {
+        enemy.animations.add('idle', [ 0, 1, 2 ,3], 20, true);
+      });
+
+   
     //Add Sprites
-    //this.ennemyLaser = this.add.sprite(512, 400, 'gLaser');
     this.player = this.add.sprite(512, 700, 'xWing');
-    this.tie = this.add.sprite(512, 380, 'tie');
 
     //Shot variables
-    //this.playerShots = [];
     this.nextShotAt = 0;
     this.shotDelay = 100;
     this.shotSpeed = 800;
 
     //Duré affichae des instructions
     this.instructionsDelay = 4; //Secondes
-
-    //animates
-    this.tie.animations.add('idle', [0, 1, 2, 3], 10, true);
+    
+    //Enemy variables
+    this.nextEnemyAt = 0;
+    this.enemyDelay = 100;
 
 
     //Scale sprites
-    this.tie.scale.set(4);
-    //this.ennemyLaser.scale.set(4);
     this.player.scale.set(4);
 
 
     //No blur
-    this.tie.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
-    //this.ennemyLaser.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
+
     this.player.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
 
     //set sprites anchor
-    this.tie.anchor.setTo(0.5, 0.5);
+    //this.tie.anchor.setTo(0.5, 0.5);
     //this.ennemyLaser.anchor.setTo(0.5, 0.5);
 
     this.player.anchor.setTo(0.5, 0.5);
 
     //sprites physics
     //this.physics.enable(this.ennemyLaser, Phaser.Physics.ARCADE);
-    this.physics.enable(this.tie, Phaser.Physics.ARCADE);
+    //this.physics.enable(this.tie, Phaser.Physics.ARCADE);
     this.physics.enable(this.player, Phaser.Physics.ARCADE);
     //this.ennemyLaser.body.velocity.y = 600;
 
@@ -107,8 +115,7 @@ BasicGame.Game.prototype = {
     this.player.speed = 400;
     this.player.body.collideWorldBounds = true;
 
-    //Start animates
-    this.tie.play('idle');
+
 
     //Affichage des commandes
     this.instructions = this.add.text(510, 600,
@@ -126,10 +133,22 @@ BasicGame.Game.prototype = {
     //Honestly, just about anything could go here. It's YOUR game after all. Eat your heart out!
 
     //Gestions des collisions
-    //this.physics.arcade.overlap(this.ennemyLaser, this.player, this.shotHit, null, this);
     this.physics.arcade.overlap(
-    this.playerShotPool, this.tie, this.shotHit, null, this
+    this.playerShotPool, this.enemyPool, this.shotHit, null, this
     );
+    
+    if (this.nextEnemyAt < this.time.now && this.enemyPool.countDead() > 0) {
+      this.nextEnemyAt = this.time.now + this.enemyDelay;
+      var enemy = this.enemyPool.getFirstExists(false);
+      // spawn at a random location top of the screen
+      enemy.reset(this.rnd.integerInRange(20, 1004), 0);
+      // also randomize the speed
+      enemy.body.velocity.y = this.rnd.integerInRange(80, 300);
+      enemy.play('idle');
+      enemy.scale.set(4);
+      enemy.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
+    }
+
     //Controle du joueur
     this.player.body.velocity.x = 0;
     this.player.body.velocity.y = 0;
@@ -180,7 +199,6 @@ BasicGame.Game.prototype = {
     laserPlayer.body.velocity.y = -this.shotSpeed;
     laserPlayer.scale.set(4);
     laserPlayer.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
-
   },
 
   shotHit: function (laser, target) {
@@ -202,7 +220,6 @@ BasicGame.Game.prototype = {
     if (debugCol) {
       this.game.debug.body(this.ennemyLaser);
       this.game.debug.body(this.playerLaser);
-      this.game.debug.body(this.tie);
       // this.game.debug.body(this.player);
     }
   },
