@@ -41,9 +41,12 @@ BasicGame.Game.prototype = {
 
     //Mise en forme de la resolution responsive
     this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-    this.game.scale.setMinMax(480, 260, 1280, 800);
+    this.scale.setMinMax(480, 260, 1024, 768);
     this.game.scale.pageAlignHorizontally = true;
     this.game.scale.pageAlignVertically = true;
+
+    //Appel pour le FullScreen
+    //this.game.input.onDown.add(this.goFullScreen, this);
 
     // premet d'enlever l'effets de flou
     this.game.renderer.renderSession.roundPixels = true;
@@ -59,7 +62,7 @@ BasicGame.Game.prototype = {
     this.checkCollisions();
     this.spawnEnemies();
     this.processPlayerInput();
-    this.processDelayEffets();
+    //this.processDelayEffets();
   },
   fire: function() {
     //Gestion du delay et pas de tir si le jouer n'es plus en vie
@@ -76,7 +79,6 @@ BasicGame.Game.prototype = {
     laserPlayer.reset(this.player.x, this.player.y - 2);
     laserPlayer.body.velocity.y = -this.shotSpeed;
 
-    laserPlayer.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
   },
   enemyHit: function(shot, enemy) {
     this.damageEnemy(enemy, 1);
@@ -105,7 +107,6 @@ BasicGame.Game.prototype = {
     explosion.body.velocity.x = sprite.body.velocity.x;
     explosion.body.velocity.y = sprite.body.velocity.y;
 
-    explosion.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
   },
   render: function() {
     //Debug Collision
@@ -116,19 +117,18 @@ BasicGame.Game.prototype = {
     }
   },
   setupPlayer: function() {
-    //Controle de base au clavier
-    this.cursors = this.input.keyboard.createCursorKeys();
-    this.player = this.add.sprite(150, 180, 'xWing'); //add sprite
-    this.player.speed = 75;
+
+    this.cursors = this.input.keyboard.createCursorKeys(); //Controle de base au clavier
+    this.player = this.add.sprite(this.game.world.centerX,this.game.world.height-15, 'xWing'); //add sprite
+    this.player.speed = 80;
     this.player.anchor.setTo(0.5, 0.5); //centre le point d'origine
     this.physics.enable(this.player, Phaser.Physics.ARCADE); //physique arcade
-    this.player.body.collideWorldBounds = true;
+    this.player.body.collideWorldBounds = true; //permet de limiter la zone de jeu
     this.player.body.setSize(4, 4, 2, 2); // reduction de la hitbox
 
   },
   setupEnemies: function() {
     //Enemy variables
-
     this.nextEnemyAt = 0;
     this.enemyDelay = 100;
     //Group ennemyPool
@@ -181,23 +181,25 @@ BasicGame.Game.prototype = {
     this.explosionPool.setAll('anchor.x', 0.5);
     this.explosionPool.setAll('anchor.y', 0.5);
     this.explosionPool.forEach(function(explosion) {
-      explosion.animations.add('start');
+    explosion.animations.add('start');
 
     });
   },
-  setupText: function() {
+  setupText: function() { //FONCTION DESACTIVER CAR LA  FONT N'EST PAS COMPATIBLE AVEC LA RESOLTUION
     //Duré affichae des instructions
-    this.instructionsDelay = 4; //Secondes
+    //this.instructionsDelay = 4; //Secondes
     //Affichage des commandes
-    this.instructions = this.add.text(510, 600,
+    /*this.instructions = this.add.text(50, 70,
       'Use Arrow Keys to Move, Press SPACE to Fire', {
-        font: '20px monospace',
+        font: '10px monospace',
         fill: '#fff',
         align: 'center'
       }
+
     );
     this.instructions.anchor.setTo(0.5, 0.5);
     this.instExpire = this.time.now + this.instructionsDelay * 600;
+    */
   },
   checkCollisions: function() {
     //Gestions des collisions
@@ -213,12 +215,11 @@ BasicGame.Game.prototype = {
       this.nextEnemyAt = this.time.now + this.enemyDelay;
       var enemy = this.enemyPool.getFirstExists(false);
       // spawn at a random location top of the screen
-      enemy.reset(this.rnd.integerInRange(15, 305), 0, this.enemyInitialHealth);
+      enemy.reset(this.rnd.integerInRange(10, 182), 0, this.enemyInitialHealth);
       // also randomize the speed
       enemy.body.velocity.y = this.rnd.integerInRange(20, 80);
       enemy.play('idle')
       enemy.health = 4;
-      enemy.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
     }
   },
   processPlayerInput: function() {
@@ -249,7 +250,9 @@ BasicGame.Game.prototype = {
       this.instructions.destroy();
     }
   },
-
+  goFullScreen: function() {
+    this.game.scale.startFullScreen(true);
+  },
   quitGame: function(pointer) {
 
     //  Here you should destroy anything you no longer need.
