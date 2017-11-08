@@ -1,10 +1,14 @@
 // Variable pour afficher les HitsBox
-var debugCol = false;
 
 BasicGame.Game = function(game) {
 
+  //DÉCLARATION DES VARIABLES GLOBALS
+  this.global = {
+    score : 0,
+    debug : false, // Pour afficher les hitboxs
+  }
 
-  //  When a State is added to Phaser it automatically has the following properties set on it, even if they already exist:
+  // When a State is added to Phaser it automatically has the following properties set on it, even if they already exist:
   this.game; //  a reference to the currently running game (Phaser.Game)
   this.add; //  used to add sprites, text, groups, etc (Phaser.GameObjectFactory)
   this.camera; //  a reference to the game camera (Phaser.Camera)
@@ -26,16 +30,29 @@ BasicGame.Game = function(game) {
   //  But do consider them as being 'reserved words', i.e. don't create a property for your own game called "world" or you'll over-write the world reference.
 
 };
-
 BasicGame.Game.prototype = {
+
+  //Déclaration des Constantes
+  SPEEDPLAYER : 60,
+  SHOTDELAY : 100,
+  SHOTSPEED : 200,
+
+
 
   preload: function() {
 
+    // GAME ASSETS (en attente de déplacer sur le boot.js)
+
+    // Graphics
     this.load.image('gLaser', 'Assets/gLaser.png');
     this.load.image('xWing', 'Assets/xWing.png');
     this.load.image('rLaser', 'Assets/rLaser.png');
     this.load.spritesheet('tie', 'Assets/tie-Sheet.png', 8, 8);
     this.load.spritesheet('explosion', 'Assets/explosion-Sheet.png', 8, 8);
+
+    // Audio
+
+
   },
   create: function() {
 
@@ -52,23 +69,30 @@ BasicGame.Game.prototype = {
     this.game.renderer.renderSession.roundPixels = true;
     Phaser.Canvas.setImageRenderingCrisp(this.game.canvas)
 
-    this.setupPlayer();
-    this.setupEnemies();
-    this.setupShot();
-    this.setupExplosions();
-    this.setupText();
+    this.setupBackground(); //Initialize Background (A completter)
+    this.setupPlayer();     //Initialize Player
+    this.setupGUI();        //Initialize GUI        (A completter)
+    this.setupEnemies();    //Initialize Enemies
+    this.setupShot();       //Initialize Player Shot
+    this.setupExplosions(); //Initialize Explosion effets
+    this.setupText();       //Initialize Text Screen
   },
+
+  //Mise a jour 60 fois par secondes
   update: function() {
     this.checkCollisions();
     this.spawnEnemies();
     this.processPlayerInput();
-    //this.processDelayEffets();
+    //this.processDelayEffets(); //Désactiver car la police actuelle n'est pas compatible avec la resolution
   },
+
+
   fire: function() {
-    //Gestion du delay et pas de tir si le jouer n'es plus en vie
+    //Gestion du delay
     if (!this.player.alive || this.nextShotAt > this.time.now) {
       return;
     }
+    //pas de tir si le jouer n'es plus en vie
     if (this.playerShotPool.countDead() === 0) {
       return;
     }
@@ -78,7 +102,6 @@ BasicGame.Game.prototype = {
     // Reset (revive) the sprite and place it in a new location
     laserPlayer.reset(this.player.x, this.player.y - 2);
     laserPlayer.body.velocity.y = -this.shotSpeed;
-
   },
   enemyHit: function(shot, enemy) {
     this.damageEnemy(enemy, 1);
@@ -110,17 +133,23 @@ BasicGame.Game.prototype = {
   },
   render: function() {
     //Debug Collision
-    if (debugCol) {
-      //this.game.debug.body(this.ennemyLaser);
-      //this.game.debug.body(this.playerLaser);
+    if (this.global.debug) {
       this.game.debug.body(this.player);
     }
+  },
+  setupBackground : function(){
+
+
+  },
+  setupGUI :function(){
+
+
   },
   setupPlayer: function() {
 
     this.cursors = this.input.keyboard.createCursorKeys(); //Controle de base au clavier
     this.player = this.add.sprite(this.game.world.centerX,this.game.world.height-15, 'xWing'); //add sprite
-    this.player.speed = 80;
+    this.player.speed = this.SPEEDPLAYER;
     this.player.anchor.setTo(0.5, 0.5); //centre le point d'origine
     this.physics.enable(this.player, Phaser.Physics.ARCADE); //physique arcade
     this.player.body.collideWorldBounds = true; //permet de limiter la zone de jeu
@@ -152,8 +181,8 @@ BasicGame.Game.prototype = {
   setupShot: function() {
     //Shot variables
     this.nextShotAt = 0;
-    this.shotDelay = 200;
-    this.shotSpeed = 200;
+    this.shotDelay = this.SHOTDELAY;
+    this.shotSpeed = this.SHOTSPEED;
 
     //Group playerShotPool
     // Add an empty sprite group into our game
@@ -211,6 +240,7 @@ BasicGame.Game.prototype = {
     );
   },
   spawnEnemies: function() {
+
     if (this.nextEnemyAt < this.time.now && this.enemyPool.countDead() > 0) {
       this.nextEnemyAt = this.time.now + this.enemyDelay;
       var enemy = this.enemyPool.getFirstExists(false);
@@ -223,29 +253,30 @@ BasicGame.Game.prototype = {
     }
   },
   processPlayerInput: function() {
-
+    //Initialise no movments
     this.player.body.velocity.x = 0;
     this.player.body.velocity.y = 0;
-    //Gestion du controle player
+
+    //Mouvement Left Right
     if (this.cursors.left.isDown) {
       this.player.body.velocity.x = -this.player.speed;
     } else if (this.cursors.right.isDown) {
       this.player.body.velocity.x = this.player.speed;
     }
-
+    //Mouvement Up Down
     if (this.cursors.up.isDown) {
       this.player.body.velocity.y = -this.player.speed;
     } else if (this.cursors.down.isDown) {
       this.player.body.velocity.y = this.player.speed;
     }
 
-    //appel de la fonction fire
+    //Call function Fire on press Space
     if (this.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
       this.fire();
     }
   },
   processDelayEffets: function() {
-    //apres un certain temps efface les instructions
+    //Clean text info
     if (this.instructions.exists && this.time.now > this.instExpire) {
       this.instructions.destroy();
     }
@@ -259,6 +290,6 @@ BasicGame.Game.prototype = {
     //  Stop music, delete sprites, purge caches, free resources, all that good stuff.
 
     //  Then let's go back to the main menu.
-    this.state.start('MainMenu');
-  }
+    //this.state.start('MainMenu');
+  },
 };
