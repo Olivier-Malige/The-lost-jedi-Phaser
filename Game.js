@@ -1,11 +1,14 @@
 // Variable pour afficher les HitsBox
 
 BasicGame.Game = function(game) {
-
-  //DÉCLARATION DES VARIABLES GLOBALS
+  /************************************************************************************************
+   * Déclaration des variables globals
+   *
+   *
+   ************************************************************************************************/
   this.global = {
-    score : 0,
-    debug : false, // Pour afficher les hitboxs
+    score: 0,
+    debug: false, // Pour afficher les hitboxs
   }
 
   // When a State is added to Phaser it automatically has the following properties set on it, even if they already exist:
@@ -31,51 +34,41 @@ BasicGame.Game = function(game) {
 
 };
 BasicGame.Game.prototype = {
-
-  //Déclaration des Constantes
-  SPEEDPLAYER : 60,
-  SHOTDELAY : 100,
-  SHOTSPEED : 200,
-
-
+  /************************************************************************************************
+   * Déclaration des Constantes
+   *
+   *
+   ************************************************************************************************/
+  SPEEDPLAYER: 60,
+  SHOTDELAY: 100,
+  SHOTSPEED: 200,
 
   preload: function() {
-
-    // GAME ASSETS (en attente de déplacer sur le boot.js)
-
+    /************************************************************************************************
+     *GAME ASSETS (en attente de déplacer sur le boot.js)
+     * Déclaration des Sprites et des sons à importer
+     *
+     ************************************************************************************************/
     // Graphics
     this.load.image('gLaser', 'Assets/gLaser.png');
     this.load.image('xWing', 'Assets/xWing.png');
     this.load.image('rLaser', 'Assets/rLaser.png');
     this.load.spritesheet('tie', 'Assets/tie-Sheet.png', 8, 8);
     this.load.spritesheet('explosion', 'Assets/explosion-Sheet.png', 8, 8);
-
     // Audio
 
 
   },
   create: function() {
 
-    //Mise en forme de la resolution responsive
-    this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-    this.scale.setMinMax(480, 260, 1024, 768);
-    this.game.scale.pageAlignHorizontally = true;
-    this.game.scale.pageAlignVertically = true;
-
-    //Appel pour le FullScreen
-    //this.game.input.onDown.add(this.goFullScreen, this);
-
-    // premet d'enlever l'effets de flou
-    this.game.renderer.renderSession.roundPixels = true;
-    Phaser.Canvas.setImageRenderingCrisp(this.game.canvas)
-
+    this.setupScaleMode(); //Initialize Sclaling and no blur
     this.setupBackground(); //Initialize Background (A completter)
-    this.setupPlayer();     //Initialize Player
-    this.setupGUI();        //Initialize GUI        (A completter)
-    this.setupEnemies();    //Initialize Enemies
-    this.setupShot();       //Initialize Player Shot
+    this.setupPlayer(); //Initialize Player
+    this.setupGUI(); //Initialize GUI        (A completter)
+    this.setupEnemies(); //Initialize Enemies
+    this.setupShot(); //Initialize Player Shot
     this.setupExplosions(); //Initialize Explosion effets
-    this.setupText();       //Initialize Text Screen
+    this.setupText(); //Initialize Text Screen
   },
 
   //Mise a jour 60 fois par secondes
@@ -86,6 +79,19 @@ BasicGame.Game.prototype = {
     //this.processDelayEffets(); //Désactiver car la police actuelle n'est pas compatible avec la resolution
   },
 
+  setupScaleMode: function() {
+
+    //Mise en forme de la resolution responsive
+    this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+    this.scale.setMinMax(480, 260, 1024, 768);
+    this.game.scale.pageAlignHorizontally = true;
+    this.game.scale.pageAlignVertically = true
+
+    // premet d'enlever l'effets de flou
+    this.game.renderer.renderSession.roundPixels = true;
+    Phaser.Canvas.setImageRenderingCrisp(this.game.canvas);
+
+  },
 
   fire: function() {
     //Gestion du delay
@@ -137,18 +143,18 @@ BasicGame.Game.prototype = {
       this.game.debug.body(this.player);
     }
   },
-  setupBackground : function(){
+  setupBackground: function() {
 
 
   },
-  setupGUI :function(){
+  setupGUI: function() {
 
 
   },
   setupPlayer: function() {
 
     this.cursors = this.input.keyboard.createCursorKeys(); //Controle de base au clavier
-    this.player = this.add.sprite(this.game.world.centerX,this.game.world.height-15, 'xWing'); //add sprite
+    this.player = this.add.sprite(this.game.world.centerX, this.game.world.height - 15, 'xWing'); //add sprite
     this.player.speed = this.SPEEDPLAYER;
     this.player.anchor.setTo(0.5, 0.5); //centre le point d'origine
     this.physics.enable(this.player, Phaser.Physics.ARCADE); //physique arcade
@@ -171,10 +177,10 @@ BasicGame.Game.prototype = {
     this.enemyPool.setAll('checkWorldBounds', true);
     // Set the animation for each sprite
     this.enemyPool.forEach(function(enemy) {
-      enemy.animations.add('idle', [0, 1, 2, 3], 20, true);
-      enemy.animations.add('hit', [4, 4, 4, 4], 20, false); //quand c'est finie retour sur idle
-      enemy.events.onAnimationComplete.add(function(e) {
-        e.play('idle');
+    enemy.animations.add('idle', [0, 1, 2, 3], 20, true);
+    enemy.animations.add('hit', [4, 4, 4, 4], 20, false); //quand c'est finie retour sur idle
+    enemy.events.onAnimationComplete.add(function(e) {
+      e.play('idle');
       }, this);
     });
   },
