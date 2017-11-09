@@ -55,13 +55,9 @@ BasicGame.Game.prototype = {
     this.load.image('rLaser', 'Assets/rLaser.png');
     this.load.spritesheet('tie', 'Assets/tie-Sheet.png', 8, 8);
     this.load.spritesheet('explosion', 'Assets/explosion-Sheet.png', 8, 8);
-<<<<<<< HEAD
-=======
-    this.load.image('star', 'assets/starLong.png');
-    this.load.image('star2', 'assets/starLong2.png');
-    this.load.image('planete', 'assets/planeteTest.png');
-
->>>>>>> 392d37c45bb6d84b6d7ec46f5364cb9661db6269
+    this.load.image('star', 'Assets/starLong.png');
+    this.load.image('star2', 'Assets/starLong2.png');
+    this.load.image('planete', 'Assets/planeteTest.png');
     // Audio
 
 
@@ -150,53 +146,49 @@ BasicGame.Game.prototype = {
       this.game.debug.body(this.player);
     }
   },
-<<<<<<< HEAD
-  setupBackground: function() {
-=======
->>>>>>> 392d37c45bb6d84b6d7ec46f5364cb9661db6269
 
-  setupBackground : function(){
-      
-    this.emitter = this.game.add.emitter(this.game.world.centerX, 0, 400);
+  setupBackground: function() {
+/*
+    this.emitter = this.game.add.emitter(this.game.world.centerX, 0, 100);
 
     this.emitter.width = this.game.world.width;
-        // emitter.angle = 30;
+    // emitter.angle = 30;
 
     this.emitter.makeParticles('star');
 
-    this.emitter.minParticleScale = 0.5;
-    this.emitter.maxParticleScale = 1;
+    this.emitter.minParticleScale = 0.1;
+    this.emitter.maxParticleScale = 0.4;
 
-    this.emitter.setYSpeed(10, 20);
+    this.emitter.setYSpeed(1, 5);
     this.emitter.setXSpeed(0, 0);
 
     this.emitter.minRotation = 0;
     this.emitter.maxRotation = 0;
 
     this.emitter.start(false, 2000, 5, 0);
-    
-    //vitesse de déplacement des étoiles modèle 2
-//    var setYSpeedA = 75;
-//    var setYSpeedB = 150;
-        
-//    this.emitter2 = this.game.add.emitter(this.game.world.centerX, 0, 400);
-//
-//    this.emitter2.width = this.game.world.width;
-//        // emitter.angle = 30; // uncomment to set an angle for the rain.
-//
-//    this.emitter2.makeParticles('star2');
-//
-//    this.emitter2.minParticleScale = 0.7;
-//    this.emitter2.maxParticleScale = 1;
-//
-//    this.emitter2.setYSpeed(15, 30);
-//    this.emitter2.setXSpeed(0, 0);
-//
-//    this.emitter2.minRotation = 0;
-//    this.emitter2.maxRotation = 0;
-//
-//    this.emitter2.start(false, 2000, 5, 0);
 
+    //vitesse de déplacement des étoiles modèle 2
+    //    var setYSpeedA = 75;
+    //    var setYSpeedB = 150;
+
+    //    this.emitter2 = this.game.add.emitter(this.game.world.centerX, 0, 400);
+    //
+    //    this.emitter2.width = this.game.world.width;
+    //        // emitter.angle = 30; // uncomment to set an angle for the rain.
+    //
+    //    this.emitter2.makeParticles('star2');
+    //
+    //    this.emitter2.minParticleScale = 0.7;
+    //    this.emitter2.maxParticleScale = 1;
+    //
+    //    this.emitter2.setYSpeed(15, 30);
+    //    this.emitter2.setXSpeed(0, 0);
+    //
+    //    this.emitter2.minRotation = 0;
+    //    this.emitter2.maxRotation = 0;
+    //
+    //    this.emitter2.start(false, 2000, 5, 0);
+*/
   },
   setupGUI: function() {
 
@@ -228,10 +220,10 @@ BasicGame.Game.prototype = {
     this.enemyPool.setAll('checkWorldBounds', true);
     // Set the animation for each sprite
     this.enemyPool.forEach(function(enemy) {
-    enemy.animations.add('idle', [0, 1, 2, 3], 20, true);
-    enemy.animations.add('hit', [4, 4, 4, 4], 20, false); //quand c'est finie retour sur idle
-    enemy.events.onAnimationComplete.add(function(e) {
-      e.play('idle');
+      enemy.animations.add('idle', [0, 1, 2, 3], 20, true);
+      enemy.animations.add('hit', [4, 4, 4, 4], 20, false); //quand c'est finie retour sur idle
+      enemy.events.onAnimationComplete.add(function(e) {
+        e.play('idle');
       }, this);
     });
   },
@@ -267,7 +259,7 @@ BasicGame.Game.prototype = {
     this.explosionPool.setAll('anchor.x', 0.5);
     this.explosionPool.setAll('anchor.y', 0.5);
     this.explosionPool.forEach(function(explosion) {
-    explosion.animations.add('start');
+      explosion.animations.add('start');
 
     });
   },
