@@ -10,21 +10,6 @@ BasicGame.Game = function(game) {
     score: 0,
     debug: false, // Pour afficher les hitboxs
   }
-    //background2
-    this.canvas;
-    this.distance = 600;
-    this.speed = 6;
-    this.max = 300;
-    this.xx = [];
-    this.yy = [];
-    this.zz = [];
-    
-    //background3
-    this.star;
-    this.texture1;
-    this.texture2;
-    this.texture3;
-    this.stars = [];
 
 
   // When a State is added to Phaser it automatically has the following properties set on it, even if they already exist:
@@ -80,37 +65,39 @@ BasicGame.Game.prototype = {
   },
   create: function() {
 
-<<<<<<< HEAD
-    this.setupScaleMode(); //Initialize Sclaling and no blur
-    this.setupBackground(); //Initialize Background (A completter)
-    this.setupPlayer(); //Initialize Player
-    this.setupGUI(); //Initialize GUI        (A completter)
-    this.setupEnemies(); //Initialize Enemies
-    this.setupShot(); //Initialize Player Shot
-=======
-    //Mise en forme de la resolution responsive
+    /************************************************************************************************
+     *A mettre dans le Load
+     *
+     *
+     ************************************************************************************************/
+
+    //Mise en forme de la resolution responsive (A mettre dans le load)
     this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
     this.scale.setMinMax(480, 260, 1024, 768);
     this.game.scale.pageAlignHorizontally = true;
     this.game.scale.pageAlignVertically = true;
 
-    //Appel pour le FullScreen
-    //this.game.input.onDown.add(this.goFullScreen, this);
-
     // premet d'enlever l'effets de flou
     this.game.renderer.renderSession.roundPixels = true;
     Phaser.Canvas.setImageRenderingCrisp(this.game.canvas)
 
-//    this.setupBackground(); //Initialize Background (A completter)
-//    this.setupBackground2(); //TEST SWITCH AVEC LE SETUPBACKGROUND POUR CHANGER D EFFET
-    this.setupBackground3(); //TEST SWITCH AVEC LE SETUPBACKGROUND POUR CHANGER D EFFET
-    this.setupPlayer();     //Initialize Player
-    this.setupGUI();        //Initialize GUI        (A completter)
-    this.setupEnemies();    //Initialize Enemies
-    this.setupShot();       //Initialize Player Shot
->>>>>>> 23e2fc863fc4ee2f12932897dd6d0f704ab98fad
+
+    /************************************************************************************************
+     *Initialize
+     *
+     ************************************************************************************************/
+
+    this.setupBackground(); //Initialize Background (A completter)
+    this.setupScaleMode(); //Initialize Sclaling and no blur
+    this.setupGUI(); //Initialize GUI        (A completter)
+    this.setupEnemies(); //Initialize Enemies
+    this.setupShot(); //Initialize Player Shot
+    this.setupGUI(); //Initialize GUI        (A completter)
+    this.setupEnemies(); //Initialize Enemies
+    this.setupShot(); //Initialize Player Shot
     this.setupExplosions(); //Initialize Explosion effets
     this.setupText(); //Initialize Text Screen
+    this.setupPlayer(); //Initialize Player
   },
 
   //Mise a jour 60 fois par secondes
@@ -119,8 +106,7 @@ BasicGame.Game.prototype = {
     this.spawnEnemies();
     this.processPlayerInput();
     //this.processDelayEffets(); //Désactiver car la police actuelle n'est pas compatible avec la resolution
-//    this.refreshBackground2(); //TEST DESACTIVER SI SWITCH AVEC SETUPBACKGROUND
-    this.refreshBackground3();
+    this.refreshBackground();
   },
 
   setupScaleMode: function() {
@@ -188,139 +174,25 @@ BasicGame.Game.prototype = {
     }
   },
 
+  setupGUI: function() {},
+
   setupBackground: function() {
-/*
-    this.emitter = this.game.add.emitter(this.game.world.centerX, 0, 100);
+    this.star;
+    this.texture1;
+    this.texture2;
+    this.texture3;
+    this.stars = [];
 
-<<<<<<< HEAD
-    this.emitter.width = this.game.world.width;
-    // emitter.angle = 30;
-=======
-    this.emitter.width = this.game.world.width * 4;
-        // emitter.angle = 30;
->>>>>>> 23e2fc863fc4ee2f12932897dd6d0f704ab98fad
-
-    this.emitter.makeParticles('star');
-
-    this.emitter.minParticleScale = 0.1;
-    this.emitter.maxParticleScale = 0.4;
-
-<<<<<<< HEAD
-    this.emitter.setYSpeed(1, 5);
-=======
-    this.emitter.setYSpeed(10, 10);
->>>>>>> 23e2fc863fc4ee2f12932897dd6d0f704ab98fad
-    this.emitter.setXSpeed(0, 0);
-
-    this.emitter.minRotation = 0;
-    this.emitter.maxRotation = 0;
-      
-    this.emitter.gravity = 25;
-
-<<<<<<< HEAD
-    this.emitter.start(false, 2000, 5, 0);
-=======
-    this.emitter.start(false, 4000, 5, 0);
-    
-    //vitesse de déplacement des étoiles modèle 2
-//    var setYSpeedA = 75;
-//    var setYSpeedB = 150;
-        
-    this.emitter2 = this.game.add.emitter(this.game.world.centerX, 0, 400);
-
-    this.emitter2.width = this.game.world.width * 7;
-        // emitter.angle = 30;
-      
-
-    this.emitter2.makeParticles('star2');
-
-    this.emitter2.minParticleScale = 0.5;
-    this.emitter2.maxParticleScale = 1;
-      
-    this.emitter2.gravity = 30;
-
-    this.emitter2.setYSpeed(10, 10);
-    this.emitter2.setXSpeed(0, 0);
-
-    this.emitter2.minRotation = 0;
-    this.emitter2.maxRotation = 0;
-
-    this.emitter2.start(false, 4000, 5, 0);
->>>>>>> 23e2fc863fc4ee2f12932897dd6d0f704ab98fad
-
-    //vitesse de déplacement des étoiles modèle 2
-    //    var setYSpeedA = 75;
-    //    var setYSpeedB = 150;
-
-    //    this.emitter2 = this.game.add.emitter(this.game.world.centerX, 0, 400);
-    //
-    //    this.emitter2.width = this.game.world.width;
-    //        // emitter.angle = 30; // uncomment to set an angle for the rain.
-    //
-    //    this.emitter2.makeParticles('star2');
-    //
-    //    this.emitter2.minParticleScale = 0.7;
-    //    this.emitter2.maxParticleScale = 1;
-    //
-    //    this.emitter2.setYSpeed(15, 30);
-    //    this.emitter2.setXSpeed(0, 0);
-    //
-    //    this.emitter2.minRotation = 0;
-    //    this.emitter2.maxRotation = 0;
-    //
-    //    this.emitter2.start(false, 2000, 5, 0);
-*/
-  },
-<<<<<<< HEAD
-  setupGUI: function() {
-=======
-    
-setupBackground2: function(){
-    
-    this.canvas = this.game.add.bitmapData(192, 160);
-    this.canvas.addToWorld();
-
-    for (var i = 0; i < this.max; i++)
-    {
-        this.xx[i] = Math.floor(Math.random() * 192) - 96;
-        this.yy[i] = Math.floor(Math.random() * 160) - 80;
-        this.zz[i] = Math.floor(Math.random() * 1700) - 100;
-    }
-},
-    
-refreshBackground2: function(){
-    this.canvas.clear();
-
-    for (var i = 0; i < this.max; i++)
-    {
-        this.perspective = this.distance / (this.distance - this.zz[i]);
-        this.x = this.game.world.centerX + this.xx[i] * this.perspective;
-        this.y = this.game.world.centerY + this.yy[i] * this.perspective;
-
-        this.zz[i] += this.speed;
-
-        if (this.zz[i] > 300)
-        {
-            this.zz[i] -= 600;
-        }
-
-        //  Swap this for a standard drawImage call
-        this.canvas.draw('star', this.x, this.y);
-    }
-},
-    
-setupBackground3: function(){
     //  This is the sprite that will be drawn to the texture
     //  Note that we 'make' it, not 'add' it, as we don't want it on the display list
     this.star = this.game.make.sprite(0, 0, 'star');
-    this.star.scale.setTo(0.5);
 
     //  For this effect we'll create a vertical scrolling starfield with 300 stars split across 3 layers.
     //  This will use only 3 textures / sprites in total.
     this.texture1 = this.game.add.renderTexture(192, 160, 'texture1');
     this.texture2 = this.game.add.renderTexture(192, 160, 'texture2');
     this.texture3 = this.game.add.renderTexture(192, 160, 'texture3');
-    
+
     this.game.add.sprite(0, 0, this.texture1);
     this.game.add.sprite(0, 0, this.texture2);
     this.game.add.sprite(0, 0, this.texture3);
@@ -329,53 +201,46 @@ setupBackground3: function(){
     this.s = 1;
 
     //  100 sprites per layer
-    for (var i = 0; i < 30; i++)
-    {
-        if (i == 10)
-        {
-            //  With each 100 stars we ramp up the speed a little and swap to the next texture
-            this.s = 1;
-            this.t = this.texture2;
-        }
-        else if (i == 20)
-        {
-            this.s = 1.5;
-            this.t = this.texture3;
-        }
+    for (var i = 0; i < 30; i++) {
+      if (i == 10) {
+        //  With each 100 stars we ramp up the speed a little and swap to the next texture
+        this.s = 1;
+        this.t = this.texture2;
+      } else if (i == 20) {
+        this.s = 1.5;
+        this.t = this.texture3;
+      }
 
-        this.stars.push( { x: this.game.world.randomX, y: this.game.world.randomY, speed: this.s, texture: this.t });
+      this.stars.push({
+        x: this.game.world.randomX,
+        y: this.game.world.randomY,
+        speed: this.s,
+        texture: this.t
+      });
     }
-},
-refreshBackground3: function(){
-    for (var i = 0; i < 30; i++)
-    {
-        //  Update the stars y position based on its speed
-        this.stars[i].y += this.stars[i].speed;
-
-        if (this.stars[i].y > 160)
-        {
-            //  Off the bottom of the screen? Then wrap around to the top
-            this.stars[i].x = this.game.world.randomX;
-            this.stars[i].y = -32;
-        }
-
-        if (i == 0 || i == 10 || i == 20)
-        {
-            //  If it's the first star of the layer then we clear the texture
-            this.stars[i].texture.renderXY(this.star, this.stars[i].x, this.stars[i].y, true);
-        }
-        else
-        {
-            //  Otherwise just draw the star sprite where we need it
-            this.stars[i].texture.renderXY(this.star, this.stars[i].x, this.stars[i].y, false);
-        }
-    }
-},
-  setupGUI :function(){
->>>>>>> 23e2fc863fc4ee2f12932897dd6d0f704ab98fad
-
-
   },
+  refreshBackground: function() {
+    for (var i = 0; i < 30; i++) {
+      //  Update the stars y position based on its speed
+      this.stars[i].y += this.stars[i].speed;
+
+      if (this.stars[i].y > 160) {
+        //  Off the bottom of the screen? Then wrap around to the top
+        this.stars[i].x = this.game.world.randomX;
+        this.stars[i].y = -32;
+      }
+
+      if (i == 0 || i == 10 || i == 20) {
+        //  If it's the first star of the layer then we clear the texture
+        this.stars[i].texture.renderXY(this.star, this.stars[i].x, this.stars[i].y, true);
+      } else {
+        //  Otherwise just draw the star sprite where we need it
+        this.stars[i].texture.renderXY(this.star, this.stars[i].x, this.stars[i].y, false);
+      }
+    }
+  },
+  setupGUI: function() {},
+
   setupPlayer: function() {
 
     this.cursors = this.input.keyboard.createCursorKeys(); //Controle de base au clavier
