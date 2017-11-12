@@ -351,7 +351,7 @@ BasicGame.Game.prototype = {
       // also randomize the speed
       enemy.body.velocity.y = enemy.speed;
       if (enemy.name == "asteroid") {
-        enemy.rotation += 1;
+        enemy.body.angularVelocity += this.game.rnd.integerInRange(20,40);
         enemy.health = this.ASTEROID_HEALTH;
         enemy.body.velocity.y = this.ASTEROID_SPEED;
       };
