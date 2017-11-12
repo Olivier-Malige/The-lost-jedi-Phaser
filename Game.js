@@ -40,9 +40,13 @@ BasicGame.Game.prototype = {
    *
    *
    ************************************************************************************************/
-  SPEEDPLAYER: 300,
-  SHOTDELAY: 300,
-  SHOTSPEED: 700,
+  SPEED_PLAYER: 300,
+  SHOT_DELAY: 300,
+  SHOT_SPEED: 1000,
+  ASTEROID_HEALTH: 8,
+  ASTEROID_SPEED: 100,
+  TIE_HEALTH: 4,
+  TIE_SPEED: 200,
 
   preload: function() {
     /************************************************************************************************
@@ -57,8 +61,6 @@ BasicGame.Game.prototype = {
     this.load.spritesheet('tie', 'Assets/tie-Sheet.png', 32, 32);
     this.load.spritesheet('explosion', 'Assets/explosion-Sheet.png', 32, 32);
     this.load.image('star', 'Assets/starLong.png');
-    this.load.image('star2', 'Assets/starLong2.png'); // a suprimer si non utiliser
-    //this.load.image('planete', 'Assets/planeteTest.png'); // a suprimer si non utiliser
     this.load.image('asteroid', 'Assets/Asteroid.png');
     this.load.image('asteroid2', 'Assets/Asteroid1.png');
     this.load.image('asteroid3', 'Assets/Asteroid2.png');
@@ -229,51 +231,19 @@ BasicGame.Game.prototype = {
 
     this.cursors = this.input.keyboard.createCursorKeys(); //Controle de base au clavier
     this.player = this.add.sprite(this.game.world.centerX, this.game.world.height - 60, 'xWing'); //add sprite
-    this.player.speed = this.SPEEDPLAYER;
+    this.player.speed = this.SPEED_PLAYER;
     this.player.anchor.setTo(0.5, 0.5); //centre le point d'origine
     this.physics.enable(this.player, Phaser.Physics.ARCADE); //physique arcade
     this.player.body.collideWorldBounds = true; //permet de limiter la zone de jeu
     this.player.body.setSize(24, 24, 4, 6); // reduction de la hitbox
 
   },
-  setupEnemies: function() {
-    //Enemy variables
-    this.nextEnemyAt = 100;
-    this.enemyDelay = 120;
-    //Group ennemyPool
-    this.enemyPool = this.add.group();
-    this.enemyPool.enableBody = true;
-    this.enemyPool.physicsBodyType = Phaser.Physics.ARCADE;
 
-    this.asteroidPool = this.add.group();
-    this.asteroidPool.createMultiple(2, 'asteroid');
-    this.asteroidPool.createMultiple(3, 'asteroid2');
-    this.asteroidPool.createMultiple(2, 'asteroid3');
-
-    this.tiePool = this.add.group();
-    this.tiePool.createMultiple(5, 'tie');
-    this.tiePool.forEach(function(child) {
-      child.animations.add('idle', [0, 1, 2, 3], 20, true);
-      child.animations.add('hit', [4, 4, 4, 4], 20, false); //quand c'est finie retour sur idle
-      child.events.onAnimationComplete.add(function(e) {
-        e.play('idle');
-      }, this);
-    });
-
-    this.enemyPool.addMultiple(this.asteroidPool);
-    this.enemyPool.addMultiple(this.tiePool);
-    this.enemyPool.setAll('anchor.x', 0.5);
-    this.enemyPool.setAll('anchor.y', 0.5);
-    this.enemyPool.setAll('outOfBoundsKill', true);
-    this.enemyPool.setAll('checkWorldBounds', true);
-    // Set the animation for each sprite
-
-  },
   setupShot: function() {
     //Shot variables
     this.nextShotAt = 0;
-    this.shotDelay = this.SHOTDELAY;
-    this.shotSpeed = this.SHOTSPEED;
+    this.shotDelay = this.SHOT_DELAY;
+    this.shotSpeed = this.SHOT_SPEED;
 
     //Group playerShotPool
     // Add an empty sprite group into our game
@@ -301,16 +271,16 @@ BasicGame.Game.prototype = {
     this.explosionPool.setAll('anchor.x', 0.5);
     this.explosionPool.setAll('anchor.y', 0.5);
     this.explosionPool.forEach(function(explosion) {
-    explosion.animations.add('start');
+      explosion.animations.add('start');
 
     });
   },
   setupText: function() { //FONCTION DESACTIVER CAR LA  FONT N'EST PAS COMPATIBLE AVEC LA RESOLTUION
     //Duré affichae des instructions
     this.instructionsDelay = 4; //Secondes
-    this.instructions = this.add.text( this.game.world.width / 2, this.game.world.height-100,
+    this.instructions = this.add.text(this.game.world.width / 2, this.game.world.height - 100,
       'Use Arrow Keys to Move Press SPACE to Fire', {
-        font: '20px tiny',
+        font: '26px tiny',
 
         fill: '#fff'
       }
@@ -330,6 +300,46 @@ BasicGame.Game.prototype = {
 
 
   },
+  setupEnemies: function() {
+    //this.enemyPool = []
+
+    //Enemy variables
+    this.nextEnemyAt = 100;
+    this.enemyDelay = 120;
+    //Group ennemyPool
+
+
+    this.asteroidPool = this.add.group();
+    this.asteroidPool.createMultiple(5, 'asteroid');
+    this.asteroidPool.createMultiple(5, 'asteroid2');
+    this.asteroidPool.createMultiple(5, 'asteroid3');
+    this.asteroidPool.forEach(function(child) {
+      child.name = "asteroid";
+    });
+
+
+    this.tiePool = this.add.group();
+    this.tiePool.createMultiple(10, 'tie');
+    this.tiePool.forEach(function(child) {
+      child.animations.add('idle', [0, 1, 2, 3], 20, true);
+      child.name = "tie";
+      child.animations.add('hit', [4, 4, 4, 4], 20, false); //quand c'est finie retour sur idle
+      child.events.onAnimationComplete.add(function(e) {
+        e.play('idle');
+      }, this);
+    });
+
+
+    this.enemyPool = this.add.group();
+    this.enemyPool.enableBody = true;
+    this.enemyPool.physicsBodyType = Phaser.Physics.ARCADE;
+    this.enemyPool.addMultiple(this.asteroidPool);
+    this.enemyPool.addMultiple(this.tiePool);
+    this.enemyPool.setAll('anchor.x', 0.5);
+    this.enemyPool.setAll('anchor.y', 0.5);
+    this.enemyPool.setAll('outOfBoundsKill', true);
+    this.enemyPool.setAll('checkWorldBounds', true);
+  },
   spawnEnemies: function() {
 
     if (this.nextEnemyAt < this.time.now && this.enemyPool.countDead() > 0) {
@@ -337,11 +347,21 @@ BasicGame.Game.prototype = {
       var enemy = this.enemyPool.getFirstExists(false);
 
       // spawn at a random location top of the screen
-      enemy.reset(this.rnd.integerInRange(0,this.game.world.width  ), 0, this.enemyInitialHealth);
+      enemy.reset(this.rnd.integerInRange(0, this.game.world.width), 0, this.enemyInitialHealth);
       // also randomize the speed
-      enemy.body.velocity.y = this.rnd.integerInRange(80, 150);
-      enemy.play('idle')
-      enemy.health = 4;
+      enemy.body.velocity.y = enemy.speed;
+      if (enemy.name == "asteroid") {
+        enemy.rotation += 1;
+        enemy.health = this.ASTEROID_HEALTH;
+        enemy.body.velocity.y = this.ASTEROID_SPEED;
+      };
+      if (enemy.name == 'tie') {
+        enemy.play('idle');
+        enemy.speed
+        enemy.health = this.TIE_HEALTH;
+        enemy.body.velocity.y = this.TIE_SPEED;
+      };
+
     }
   },
   processPlayerInput: function() {
