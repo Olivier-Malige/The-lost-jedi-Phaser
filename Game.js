@@ -64,6 +64,7 @@ BasicGame.Game.prototype = {
     this.load.image('asteroid', 'Assets/Asteroid.png');
     this.load.image('asteroid2', 'Assets/Asteroid1.png');
     this.load.image('asteroid3', 'Assets/Asteroid2.png');
+    this.load.image('interceptor','Assets/interceptor.png')
     // Audio
 
 
@@ -76,7 +77,6 @@ BasicGame.Game.prototype = {
      *Initialize
      *
      ************************************************************************************************/
-    this.game.physics.startSystem(Phaser.Physics.ARCADE);
     this.setupBackground(); //Initialize Background (A completter)
     this.setupScaleMode(); //Initialize Sclaling and no blur
     this.setupGUI(); //Initialize GUI        (A completter)
@@ -128,12 +128,10 @@ BasicGame.Game.prototype = {
     laserPlayer.body.velocity.y = -this.shotSpeed;
   },
   destroy: function(a,b){
-
       a.kill();
       this.explode(a);
       b.kill();
       this.explode(b);
-  
   },
 
   enemyHit: function(shot, enemy) {
@@ -324,6 +322,8 @@ BasicGame.Game.prototype = {
     //Group ennemyPool
 
 
+
+
     this.asteroidPool = this.add.group();
     this.asteroidPool.createMultiple(5, 'asteroid');
     this.asteroidPool.createMultiple(5, 'asteroid2');
@@ -334,7 +334,7 @@ BasicGame.Game.prototype = {
 
 
     this.tiePool = this.add.group();
-    this.tiePool.createMultiple(10, 'tie');
+    this.tiePool.createMultiple(5, 'tie');
     this.tiePool.forEach(function(child) {
       child.animations.add('idle', [0, 1, 2, 3], 20, true);
       child.name = "tie";
@@ -342,6 +342,12 @@ BasicGame.Game.prototype = {
       child.events.onAnimationComplete.add(function(e) {
         e.play('idle');
       }, this);
+    });
+
+    this.interceptorPool = this.add.group();
+    this.interceptorPool.createMultiple(1, 'interceptor');
+    this.interceptorPool.forEach(function(child) {
+      child.name = "interceptor";
     });
 
 
@@ -353,6 +359,7 @@ BasicGame.Game.prototype = {
 
     this.enemyPool.addMultiple(this.asteroidPool);
     this.enemyPool.addMultiple(this.tiePool);
+    this.enemyPool.addMultiple(this.interceptorPool);
     this.enemyPool.setAll('anchor.x', 0.5);
     this.enemyPool.setAll('anchor.y', 0.5);
     this.enemyPool.setAll('outOfBoundsKill', true);
@@ -380,6 +387,10 @@ BasicGame.Game.prototype = {
       };
       if (enemy.name == 'tie') {
         enemy.play('idle');
+        enemy.health = this.TIE_HEALTH;
+        enemy.body.velocity.y = this.TIE_SPEED;
+      };
+      if (enemy.name == 'interceptor') {
         enemy.health = this.TIE_HEALTH;
         enemy.body.velocity.y = this.TIE_SPEED;
       };
