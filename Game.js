@@ -41,7 +41,7 @@ BasicGame.Game.prototype = {
    *
    ************************************************************************************************/
   SPEED_PLAYER: 300,
-  SHOT_DELAY: 300,
+  SHOT_DELAY: 150,
   SHOT_SPEED: 1000,
   ASTEROID_HEALTH: 8,
   ASTEROID_SPEED: 100,
@@ -76,7 +76,7 @@ BasicGame.Game.prototype = {
      *Initialize
      *
      ************************************************************************************************/
-
+    this.game.physics.startSystem(Phaser.Physics.ARCADE);
     this.setupBackground(); //Initialize Background (A completter)
     this.setupScaleMode(); //Initialize Sclaling and no blur
     this.setupGUI(); //Initialize GUI        (A completter)
@@ -88,6 +88,7 @@ BasicGame.Game.prototype = {
     this.setupExplosions(); //Initialize Explosion effets
     this.setupText(); //Initialize Text Screen
     this.setupPlayer(); //Initialize Player
+
   },
 
   //Mise a jour 60 fois par secondes
@@ -97,6 +98,7 @@ BasicGame.Game.prototype = {
     this.processPlayerInput();
     this.processDelayEffets(); //Désactiver car la police actuelle n'est pas compatible avec la resolution
     this.refreshBackground();
+
   },
 
   setupScaleMode: function() {
@@ -125,13 +127,22 @@ BasicGame.Game.prototype = {
     laserPlayer.reset(this.player.x, this.player.y - 2);
     laserPlayer.body.velocity.y = -this.shotSpeed;
   },
+  destroy: function(a,b){
+
+      a.kill();
+      this.explode(a);
+      b.kill();
+      this.explode(b);
+  
+  },
+
   enemyHit: function(shot, enemy) {
     this.damageEnemy(enemy, 1);
     shot.kill();
   },
   playerHit: function(player, enemy) {
-    this.damageEnemy(enemy, 5);
     player.kill();
+    this.explode(enemy);
   },
   damageEnemy: function(enemy, damage) {
     enemy.damage(damage);
@@ -297,9 +308,13 @@ BasicGame.Game.prototype = {
     this.physics.arcade.overlap(
       this.player, this.enemyPool, this.playerHit, null, this
     );
+    this.physics.arcade.overlap(
+      this.enemyPool, this.enemyPool, this.destroy, null, this
+    );
 
 
   },
+
   setupEnemies: function() {
     //this.enemyPool = []
 
@@ -332,7 +347,10 @@ BasicGame.Game.prototype = {
 
     this.enemyPool = this.add.group();
     this.enemyPool.enableBody = true;
+
     this.enemyPool.physicsBodyType = Phaser.Physics.ARCADE;
+
+
     this.enemyPool.addMultiple(this.asteroidPool);
     this.enemyPool.addMultiple(this.tiePool);
     this.enemyPool.setAll('anchor.x', 0.5);
@@ -350,14 +368,18 @@ BasicGame.Game.prototype = {
       enemy.reset(this.rnd.integerInRange(0, this.game.world.width), 0, this.enemyInitialHealth);
       // also randomize the speed
       enemy.body.velocity.y = enemy.speed;
+      enemy.body.setSize(32, 32, 0, 0);
       if (enemy.name == "asteroid") {
+        enemy.body.bounce.y = 0.95;
+        enemy.body.enable = true;
+        enemy.body.checkCollisionsUp = true;
         enemy.body.angularVelocity += this.game.rnd.integerInRange(20,40);
         enemy.health = this.ASTEROID_HEALTH;
-        enemy.body.velocity.y = this.ASTEROID_SPEED;
+        enemy.body.velocity.y = this.ASTEROID_SPEED + this.game.rnd.integerInRange(1,100);
+        enemy.body.velocity.x = this.game.rnd.integerInRange(-20,20);
       };
       if (enemy.name == 'tie') {
         enemy.play('idle');
-        enemy.speed
         enemy.health = this.TIE_HEALTH;
         enemy.body.velocity.y = this.TIE_SPEED;
       };
