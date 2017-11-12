@@ -8,7 +8,7 @@ BasicGame.Game = function(game) {
    ************************************************************************************************/
   this.global = {
     score: 0,
-    debug: false, // Pour afficher les hitboxs
+    debug: true, // Pour afficher les hitboxs
   }
 
 
@@ -43,10 +43,12 @@ BasicGame.Game.prototype = {
   SPEED_PLAYER: 300,
   SHOT_DELAY: 150,
   SHOT_SPEED: 1000,
-  ASTEROID_HEALTH: 8,
+  ASTEROID_HEALTH: 4,
   ASTEROID_SPEED: 100,
   TIE_HEALTH: 4,
-  TIE_SPEED: 200,
+  TIE_SPEED: 300,
+  INTERCEPTOR_HEALTH: 8,
+  INTERCEPTOR_SPEED: 200,
 
   preload: function() {
     /************************************************************************************************
@@ -193,16 +195,16 @@ BasicGame.Game.prototype = {
     this.game.add.sprite(0, 0, this.texture3);
 
     this.t = this.texture1;
-    this.s = 2;
+    this.s = 3;
 
     //  100 sprites per layer
-    for (var i = 0; i < 30; i++) {
-      if (i == 10) {
+    for (var i = 0; i < 100 ; i++) {
+      if (i == 5) {
         //  With each 100 stars we ramp up the speed a little and swap to the next texture
-        this.s = 3;
-        this.t = this.texture2;
-      } else if (i == 20) {
         this.s = 4;
+        this.t = this.texture2;
+      } else if (i == 15) {
+        this.s = 6;
         this.t = this.texture3;
       }
 
@@ -311,6 +313,7 @@ BasicGame.Game.prototype = {
     );
 
 
+
   },
 
   setupEnemies: function() {
@@ -321,13 +324,10 @@ BasicGame.Game.prototype = {
     this.enemyDelay = 120;
     //Group ennemyPool
 
-
-
-
     this.asteroidPool = this.add.group();
-    this.asteroidPool.createMultiple(5, 'asteroid');
-    this.asteroidPool.createMultiple(5, 'asteroid2');
-    this.asteroidPool.createMultiple(5, 'asteroid3');
+    this.asteroidPool.createMultiple(4, 'asteroid');
+    this.asteroidPool.createMultiple(4, 'asteroid2');
+    this.asteroidPool.createMultiple(4, 'asteroid3');
     this.asteroidPool.forEach(function(child) {
       child.name = "asteroid";
     });
@@ -348,8 +348,9 @@ BasicGame.Game.prototype = {
     this.interceptorPool.createMultiple(1, 'interceptor');
     this.interceptorPool.forEach(function(child) {
       child.name = "interceptor";
+      //this.physics.enable(child, Phaser.Physics.ARCADE); //physique arcade
+      //child.interceptorPool.body.setSize(64, 32, 8, 8);
     });
-
 
     this.enemyPool = this.add.group();
     this.enemyPool.enableBody = true;
@@ -374,10 +375,11 @@ BasicGame.Game.prototype = {
       // spawn at a random location top of the screen
       enemy.reset(this.rnd.integerInRange(0, this.game.world.width), 0, this.enemyInitialHealth);
       // also randomize the speed
+      this.game.physics.enable(enemy, Phaser.Physics.ARCADE); //physique arcade
       enemy.body.velocity.y = enemy.speed;
       enemy.body.setSize(32, 32, 0, 0);
       if (enemy.name == "asteroid") {
-        enemy.body.bounce.y = 0.95;
+
         enemy.body.enable = true;
         enemy.body.checkCollisionsUp = true;
         enemy.body.angularVelocity += this.game.rnd.integerInRange(20,40);
@@ -391,8 +393,9 @@ BasicGame.Game.prototype = {
         enemy.body.velocity.y = this.TIE_SPEED;
       };
       if (enemy.name == 'interceptor') {
-        enemy.health = this.TIE_HEALTH;
-        enemy.body.velocity.y = this.TIE_SPEED;
+        enemy.body.setSize(56, 28, 6, 6);
+        enemy.health = this.INTERCEPTOR_HEALTH;
+        enemy.body.velocity.y = this.INTERCEPTOR_SPEED;
       };
 
     }
