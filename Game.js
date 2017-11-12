@@ -63,10 +63,10 @@ BasicGame.Game.prototype = {
     this.load.spritesheet('tie', 'Assets/tie-Sheet.png', 32, 32);
     this.load.spritesheet('explosion', 'Assets/explosion-Sheet.png', 32, 32);
     this.load.image('star', 'Assets/starLong.png');
-    this.load.image('asteroid', 'Assets/Asteroid.png');
-    this.load.image('asteroid2', 'Assets/Asteroid1.png');
-    this.load.image('asteroid3', 'Assets/Asteroid2.png');
-    this.load.image('interceptor','Assets/interceptor.png')
+    this.load.spritesheet('asteroid', 'Assets/Asteroid.png',32,32);
+    this.load.spritesheet('asteroid2', 'Assets/Asteroid1.png',32,32);
+    this.load.spritesheet('asteroid3', 'Assets/Asteroid2.png',32,32);
+    this.load.spritesheet('interceptor','Assets/interceptor.png',64,32)
     // Audio
 
 
