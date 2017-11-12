@@ -329,6 +329,11 @@ BasicGame.Game.prototype = {
     this.asteroidPool.createMultiple(4, 'asteroid2');
     this.asteroidPool.createMultiple(4, 'asteroid3');
     this.asteroidPool.forEach(function(child) {
+      child.animations.add('idle', [0]);
+      child.animations.add('hit', [0,1,0,1],20,false);
+      child.events.onAnimationComplete.add(function(e) {
+        e.play('idle');
+      }, this);
       child.name = "asteroid";
     });
 
@@ -338,7 +343,7 @@ BasicGame.Game.prototype = {
     this.tiePool.forEach(function(child) {
       child.animations.add('idle', [0, 1, 2, 3], 20, true);
       child.name = "tie";
-      child.animations.add('hit', [4, 4, 4, 4], 20, false); //quand c'est finie retour sur idle
+      child.animations.add('hit', [0, 4, 0, 4], 20, false); //quand c'est finie retour sur idle
       child.events.onAnimationComplete.add(function(e) {
         e.play('idle');
       }, this);
@@ -348,6 +353,11 @@ BasicGame.Game.prototype = {
     this.interceptorPool.createMultiple(1, 'interceptor');
     this.interceptorPool.forEach(function(child) {
       child.name = "interceptor";
+      child.animations.add('idle', [0, 1, 2], 20, true);
+      child.animations.add('hit', [0, 3, 0, 3], 20, false); //quand c'est finie retour sur idle
+      child.events.onAnimationComplete.add(function(e) {
+        e.play('idle');
+      }, this);
       //this.physics.enable(child, Phaser.Physics.ARCADE); //physique arcade
       //child.interceptorPool.body.setSize(64, 32, 8, 8);
     });
@@ -393,6 +403,7 @@ BasicGame.Game.prototype = {
         enemy.body.velocity.y = this.TIE_SPEED;
       };
       if (enemy.name == 'interceptor') {
+        enemy.play('idle');
         enemy.body.setSize(56, 28, 6, 6);
         enemy.health = this.INTERCEPTOR_HEALTH;
         enemy.body.velocity.y = this.INTERCEPTOR_SPEED;
