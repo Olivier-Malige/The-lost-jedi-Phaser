@@ -1,10 +1,22 @@
+@font-face {
+    font-family: 'tiny';
+    src: url("./Assets/Fonts/slkscr.ttf");
+}
+.hiddenText {
+font-family: 'tiny';
+visibility: hidden;
+}
+
 html, body {
-  width: 100%;
-  height: 100%;
   margin: 0;
   background: rgb(0, 28, 83);
 }
-
-.gameContainer{
-  box-shadow: 20px 10px 15px rgb(0, 0, 0,);
+canvas {
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -webkit-crisp-edges;
+  image-rendering: pixelated;
+}
+p{
+  font-family: 'tiny';
+  color: white;
 }

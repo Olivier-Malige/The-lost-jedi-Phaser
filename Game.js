@@ -40,9 +40,9 @@ BasicGame.Game.prototype = {
    *
    *
    ************************************************************************************************/
-  SPEEDPLAYER: 60,
+  SPEEDPLAYER: 300,
   SHOTDELAY: 100,
-  SHOTSPEED: 200,
+  SHOTSPEED: 700,
 
   preload: function() {
     /************************************************************************************************
@@ -54,32 +54,20 @@ BasicGame.Game.prototype = {
     this.load.image('gLaser', 'Assets/gLaser.png');
     this.load.image('xWing', 'Assets/xWing.png');
     this.load.image('rLaser', 'Assets/rLaser.png');
-    this.load.spritesheet('tie', 'Assets/tie-Sheet.png', 8, 8);
-    this.load.spritesheet('explosion', 'Assets/explosion-Sheet.png', 8, 8);
+    this.load.spritesheet('tie', 'Assets/tie-Sheet.png', 32, 32);
+    this.load.spritesheet('explosion', 'Assets/explosion-Sheet.png', 32, 32);
     this.load.image('star', 'Assets/starLong.png');
-    this.load.image('star2', 'Assets/starLong2.png');
-    this.load.image('planete', 'Assets/planeteTest.png');
+    this.load.image('star2', 'Assets/starLong2.png'); // a suprimer si non utiliser
+    //this.load.image('planete', 'Assets/planeteTest.png'); // a suprimer si non utiliser
+    this.load.image('asteroid', 'Assets/Asteroid.png');
+    this.load.image('asteroid2', 'Assets/Asteroid1.png');
+    this.load.image('asteroid3', 'Assets/Asteroid2.png');
     // Audio
 
 
   },
   create: function() {
 
-    /************************************************************************************************
-     *A mettre dans le Load
-     *
-     *
-     ************************************************************************************************/
-
-    //Mise en forme de la resolution responsive (A mettre dans le load)
-    this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-    this.scale.setMinMax(480, 260, 1024, 768);
-    this.game.scale.pageAlignHorizontally = true;
-    this.game.scale.pageAlignVertically = true;
-
-    // premet d'enlever l'effets de flou
-    this.game.renderer.renderSession.roundPixels = true;
-    Phaser.Canvas.setImageRenderingCrisp(this.game.canvas)
 
 
     /************************************************************************************************
@@ -105,7 +93,7 @@ BasicGame.Game.prototype = {
     this.checkCollisions();
     this.spawnEnemies();
     this.processPlayerInput();
-    //this.processDelayEffets(); //Désactiver car la police actuelle n'est pas compatible avec la resolution
+    this.processDelayEffets(); //Désactiver car la police actuelle n'est pas compatible avec la resolution
     this.refreshBackground();
   },
 
@@ -116,10 +104,6 @@ BasicGame.Game.prototype = {
     this.scale.setMinMax(480, 260, 1024, 768);
     this.game.scale.pageAlignHorizontally = true;
     this.game.scale.pageAlignVertically = true
-
-    // premet d'enlever l'effets de flou
-    this.game.renderer.renderSession.roundPixels = true;
-    Phaser.Canvas.setImageRenderingCrisp(this.game.canvas);
 
   },
 
@@ -189,25 +173,25 @@ BasicGame.Game.prototype = {
 
     //  For this effect we'll create a vertical scrolling starfield with 300 stars split across 3 layers.
     //  This will use only 3 textures / sprites in total.
-    this.texture1 = this.game.add.renderTexture(192, 160, 'texture1');
-    this.texture2 = this.game.add.renderTexture(192, 160, 'texture2');
-    this.texture3 = this.game.add.renderTexture(192, 160, 'texture3');
+    this.texture1 = this.game.add.renderTexture(this.game.world.width, this.game.world.height, 'texture1');
+    this.texture2 = this.game.add.renderTexture(this.game.world.width, this.game.world.height, 'texture2');
+    this.texture3 = this.game.add.renderTexture(this.game.world.width, this.game.world.height, 'texture3');
 
     this.game.add.sprite(0, 0, this.texture1);
     this.game.add.sprite(0, 0, this.texture2);
     this.game.add.sprite(0, 0, this.texture3);
 
     this.t = this.texture1;
-    this.s = 1;
+    this.s = 2;
 
     //  100 sprites per layer
     for (var i = 0; i < 30; i++) {
       if (i == 10) {
         //  With each 100 stars we ramp up the speed a little and swap to the next texture
-        this.s = 1;
+        this.s = 3;
         this.t = this.texture2;
       } else if (i == 20) {
-        this.s = 1.5;
+        this.s = 4;
         this.t = this.texture3;
       }
 
@@ -224,7 +208,7 @@ BasicGame.Game.prototype = {
       //  Update the stars y position based on its speed
       this.stars[i].y += this.stars[i].speed;
 
-      if (this.stars[i].y > 160) {
+      if (this.stars[i].y > this.game.world.width) {
         //  Off the bottom of the screen? Then wrap around to the top
         this.stars[i].x = this.game.world.randomX;
         this.stars[i].y = -32;
@@ -244,35 +228,46 @@ BasicGame.Game.prototype = {
   setupPlayer: function() {
 
     this.cursors = this.input.keyboard.createCursorKeys(); //Controle de base au clavier
-    this.player = this.add.sprite(this.game.world.centerX, this.game.world.height - 15, 'xWing'); //add sprite
+    this.player = this.add.sprite(this.game.world.centerX, this.game.world.height - 60, 'xWing'); //add sprite
     this.player.speed = this.SPEEDPLAYER;
     this.player.anchor.setTo(0.5, 0.5); //centre le point d'origine
     this.physics.enable(this.player, Phaser.Physics.ARCADE); //physique arcade
     this.player.body.collideWorldBounds = true; //permet de limiter la zone de jeu
-    this.player.body.setSize(4, 4, 2, 2); // reduction de la hitbox
+    this.player.body.setSize(24, 24, 4, 6); // reduction de la hitbox
 
   },
   setupEnemies: function() {
     //Enemy variables
-    this.nextEnemyAt = 0;
-    this.enemyDelay = 100;
+    this.nextEnemyAt = 100;
+    this.enemyDelay = 120;
     //Group ennemyPool
     this.enemyPool = this.add.group();
     this.enemyPool.enableBody = true;
     this.enemyPool.physicsBodyType = Phaser.Physics.ARCADE;
-    this.enemyPool.createMultiple(50, 'tie');
+
+    this.asteroidPool = this.add.group();
+    this.tiePool = this.add.group();
+
+    this.tiePool.createMultiple(5, 'tie');
+    this.asteroidPool.createMultiple(2, 'asteroid');
+    this.asteroidPool.createMultiple(3, 'asteroid2');
+    this.asteroidPool.createMultiple(2, 'asteroid3');
+    this.tiePool.forEach(function(child) {
+      child.animations.add('idle', [0, 1, 2, 3], 20, true);
+      child.animations.add('hit', [4, 4, 4, 4], 20, false); //quand c'est finie retour sur idle
+      child.events.onAnimationComplete.add(function(e) {
+        e.play('idle');
+      }, this);
+    });
+
+    this.enemyPool.addMultiple(this.asteroidPool);
+    this.enemyPool.addMultiple(this.tiePool);
     this.enemyPool.setAll('anchor.x', 0.5);
     this.enemyPool.setAll('anchor.y', 0.5);
     this.enemyPool.setAll('outOfBoundsKill', true);
     this.enemyPool.setAll('checkWorldBounds', true);
     // Set the animation for each sprite
-    this.enemyPool.forEach(function(enemy) {
-      enemy.animations.add('idle', [0, 1, 2, 3], 20, true);
-      enemy.animations.add('hit', [4, 4, 4, 4], 20, false); //quand c'est finie retour sur idle
-      enemy.events.onAnimationComplete.add(function(e) {
-        e.play('idle');
-      }, this);
-    });
+
   },
   setupShot: function() {
     //Shot variables
@@ -306,25 +301,23 @@ BasicGame.Game.prototype = {
     this.explosionPool.setAll('anchor.x', 0.5);
     this.explosionPool.setAll('anchor.y', 0.5);
     this.explosionPool.forEach(function(explosion) {
-      explosion.animations.add('start');
+    explosion.animations.add('start');
 
     });
   },
   setupText: function() { //FONCTION DESACTIVER CAR LA  FONT N'EST PAS COMPATIBLE AVEC LA RESOLTUION
     //Duré affichae des instructions
-    //this.instructionsDelay = 4; //Secondes
-    //Affichage des commandes
-    /*this.instructions = this.add.text(50, 70,
-      'Use Arrow Keys to Move, Press SPACE to Fire', {
-        font: '10px monospace',
-        fill: '#fff',
-        align: 'center'
-      }
+    this.instructionsDelay = 4; //Secondes
+    this.instructions = this.add.text( this.game.world.width / 2, this.game.world.height-100,
+      'Use Arrow Keys to Move Press SPACE to Fire', {
+        font: '20px tiny',
 
+        fill: '#fff'
+      }
     );
     this.instructions.anchor.setTo(0.5, 0.5);
     this.instExpire = this.time.now + this.instructionsDelay * 600;
-    */
+
   },
   checkCollisions: function() {
     //Gestions des collisions
@@ -334,14 +327,17 @@ BasicGame.Game.prototype = {
     this.physics.arcade.overlap(
       this.player, this.enemyPool, this.playerHit, null, this
     );
+
+
   },
   spawnEnemies: function() {
 
     if (this.nextEnemyAt < this.time.now && this.enemyPool.countDead() > 0) {
       this.nextEnemyAt = this.time.now + this.enemyDelay;
       var enemy = this.enemyPool.getFirstExists(false);
+
       // spawn at a random location top of the screen
-      enemy.reset(this.rnd.integerInRange(10, 182), 0, this.enemyInitialHealth);
+      enemy.reset(this.rnd.integerInRange(0,this.game.world.width  ), 0, this.enemyInitialHealth);
       // also randomize the speed
       enemy.body.velocity.y = this.rnd.integerInRange(20, 80);
       enemy.play('idle')
