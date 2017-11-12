@@ -8,7 +8,7 @@ BasicGame.Game = function(game) {
    ************************************************************************************************/
   this.global = {
     score: 0,
-    debug: true, // Pour afficher les hitboxs
+    debug: false, // Pour afficher les hitboxs
   }
 
 
@@ -58,7 +58,7 @@ BasicGame.Game.prototype = {
      ************************************************************************************************/
     // Graphics
     this.load.image('gLaser', 'Assets/gLaser.png');
-    this.load.image('xWing', 'Assets/xWing.png');
+    this.load.spritesheet('xWing', 'Assets/xWing.png',32,32);
     this.load.image('rLaser', 'Assets/rLaser.png');
     this.load.spritesheet('tie', 'Assets/tie-Sheet.png', 32, 32);
     this.load.spritesheet('explosion', 'Assets/explosion-Sheet.png', 32, 32);
@@ -242,6 +242,11 @@ BasicGame.Game.prototype = {
 
     this.cursors = this.input.keyboard.createCursorKeys(); //Controle de base au clavier
     this.player = this.add.sprite(this.game.world.centerX, this.game.world.height - 60, 'xWing'); //add sprite
+    this.player.animations.add('idle', [0]);
+    this.player.animations.add('left', [2]);
+    this.player.animations.add('right',[1]);
+
+    this.player.play('idle');
     this.player.speed = this.SPEED_PLAYER;
     this.player.anchor.setTo(0.5, 0.5); //centre le point d'origine
     this.physics.enable(this.player, Phaser.Physics.ARCADE); //physique arcade
@@ -415,12 +420,15 @@ BasicGame.Game.prototype = {
     //Initialise no movments
     this.player.body.velocity.x = 0;
     this.player.body.velocity.y = 0;
+    this.player.play('idle');
 
     //Mouvement Left Right
     if (this.cursors.left.isDown) {
       this.player.body.velocity.x = -this.player.speed;
+      this.player.play('left');
     } else if (this.cursors.right.isDown) {
       this.player.body.velocity.x = this.player.speed;
+      this.player.play('right');
     }
     //Mouvement Up Down
     if (this.cursors.up.isDown) {
