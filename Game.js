@@ -41,7 +41,7 @@ BasicGame.Game.prototype = {
    *
    ************************************************************************************************/
   SPEEDPLAYER: 300,
-  SHOTDELAY: 100,
+  SHOTDELAY: 300,
   SHOTSPEED: 700,
 
   preload: function() {
@@ -246,12 +246,12 @@ BasicGame.Game.prototype = {
     this.enemyPool.physicsBodyType = Phaser.Physics.ARCADE;
 
     this.asteroidPool = this.add.group();
-    this.tiePool = this.add.group();
-
-    this.tiePool.createMultiple(5, 'tie');
     this.asteroidPool.createMultiple(2, 'asteroid');
     this.asteroidPool.createMultiple(3, 'asteroid2');
     this.asteroidPool.createMultiple(2, 'asteroid3');
+
+    this.tiePool = this.add.group();
+    this.tiePool.createMultiple(5, 'tie');
     this.tiePool.forEach(function(child) {
       child.animations.add('idle', [0, 1, 2, 3], 20, true);
       child.animations.add('hit', [4, 4, 4, 4], 20, false); //quand c'est finie retour sur idle
@@ -339,7 +339,7 @@ BasicGame.Game.prototype = {
       // spawn at a random location top of the screen
       enemy.reset(this.rnd.integerInRange(0,this.game.world.width  ), 0, this.enemyInitialHealth);
       // also randomize the speed
-      enemy.body.velocity.y = this.rnd.integerInRange(20, 80);
+      enemy.body.velocity.y = this.rnd.integerInRange(80, 150);
       enemy.play('idle')
       enemy.health = 4;
     }
